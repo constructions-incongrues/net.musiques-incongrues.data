@@ -1,0 +1,27 @@
+Thread:
+  columns:
+    title:
+      type: string(255)
+      notnull: true
+
+Post:
+  actAs:
+    Solr:
+      fields: [ title, body ]
+      fieldmap: { title: title_t, body: body_t }
+      boost: { title: 2 }
+
+  columns:
+    thread_id:
+      type: integer
+      notnull: true
+    title:
+      type: string(255)
+      notnull: true
+    body:
+      type: clob
+      notnull: true
+  relations:
+    Thread:
+      onDelete: CASCADE
+      foreignAlias: Posts

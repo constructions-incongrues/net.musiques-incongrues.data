@@ -1,0 +1,12 @@
+Thread:
+  thread1:
+    title: Test Thread
+    Posts:
+      post1:
+        title: This is a gloubigoulba title
+        body: This is the body of my test thread
+
+
+      post2:
+        title: Another useless post
+        body: This is a gloubigoulba body
