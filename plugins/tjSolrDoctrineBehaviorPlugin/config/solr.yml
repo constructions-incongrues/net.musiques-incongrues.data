@@ -1,8 +1,0 @@
-# Can be overriden at application level
-# Prefix : solr_
-
-all:
-  fields:
-    types:
-      clob: text
-      integer: int

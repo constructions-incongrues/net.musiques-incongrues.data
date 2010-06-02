@@ -1,7 +1,0 @@
-127.0.0.1 -  -  [11/05/2010:03:00:15 +0000] "GET /solr/admin/ HTTP/1.1" 200 3838 
-127.0.0.1 -  -  [11/05/2010:03:00:16 +0000] "GET /solr/admin/solr-admin.css HTTP/1.1" 200 3846 
-127.0.0.1 -  -  [11/05/2010:03:00:17 +0000] "GET /solr/admin/solr_small.png HTTP/1.1" 200 7926 
-127.0.0.1 -  -  [11/05/2010:03:00:17 +0000] "GET /solr/admin/favicon.ico HTTP/1.1" 200 1146 
-127.0.0.1 -  -  [11/05/2010:03:00:18 +0000] "GET /solr/select/?q=solr&version=2.2&start=0&rows=10&indent=on HTTP/1.1" 200 376 
-127.0.0.1 -  -  [11/05/2010:03:00:19 +0000] "GET /favicon.ico HTTP/1.1" 200 1150 
-127.0.0.1 -  -  [11/05/2010:03:00:20 +0000] "GET /solr/admin/ HTTP/1.1" 200 3838 
