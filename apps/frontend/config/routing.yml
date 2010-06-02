@@ -1,16 +1,32 @@
 # You can find more information about this file on the symfony website:
 # http://www.symfony-project.org/reference/1_4/en/10-Routing
 
-# default rules
+# Returns group data depending on query parameters and required response format
+resources_type_group_get:
+  url:    /resources/:type/groups/:group/get
+  param: { module: resource, action: get, sf_format: html }
+
+# Shows available resource types for required resource type
+resources_type_group_formats:
+  url:    /resources/:type/groups/:group/formats
+  param: { module: resource, action: formats }
+
+# Shows available groups for required resource type
+resources_type_groups:
+  url:    /resources/:type/groups
+  param: { module: resource, action: groups }
+
+# Shows documentation and drill down links for required resource type
+resources_type:
+  url:    /resources/:type
+  param: { module: resource, action: show }
+  
+# Lists all available resources
+resources:
+  url:    /resources
+  param: { module: resource, action: types }
+
+# Homeage
 homepage:
-  url:   /
-  param: { module: default, action: index }
-
-# generic rules
-# please, remove them by adding more specific rules
-default_index:
-  url:   /:module
-  param: { action: index }
-
-default:
-  url:   /:module/:action/*
+  url:    /
+  param: { module: resource, action: types }

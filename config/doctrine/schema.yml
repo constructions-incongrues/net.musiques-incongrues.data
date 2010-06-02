@@ -1,0 +1,32 @@
+Link:
+  actAs:
+    Timestampable:
+  columns:
+    id:
+      type: integer
+      autoincrement: true
+      primary: true
+      notnull: true
+    url:
+      type:    string
+      notnull: true
+    domain_parent:
+      type:    string
+      notnull: true
+    domain_fqdn:
+      type:    string
+      notnull: true    
+    mime_type: 
+      type:    string
+    contributed_at:
+      type:    datetime
+    contributor_id:
+      type:    integer
+    contributor_name:
+      type:    string
+    comment_id:
+      type:    integer
+    discussion_id:
+      type:    integer
+    discussion_name:
+      type:    string

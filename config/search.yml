@@ -1,0 +1,35 @@
+IndexA:
+  models:
+    Link:
+      fields:
+        url:
+          stored:    true
+        domain_parent:
+          stored:    true
+        domain_fqdn:
+          stored:    true
+        mime_type: 
+          stored:    true
+        contributed_at:
+          stored:    true
+        contributor_id:
+          stored:    true
+          type:      int
+        contributor_name:
+          stored:    true
+        comment_id:
+          stored:    true
+          type:      int
+        discussion_id:
+          stored:    true
+          type:      int
+        discussion_name:
+          stored:    true
+          
+  index:
+    encoding: UTF-8
+    cultures: [fr]
+    host: 127.0.0.1
+    port: 8983
+    base_url: "/solr"
+   
