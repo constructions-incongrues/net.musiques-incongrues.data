@@ -46,6 +46,7 @@ class resourceActions extends sfActions
     $format = $request->getParameter('format', 'html');
     
     // TODO : autoload those clases
+    include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/%s/ResourceGroup.php', ucfirst($resource_type));
     include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/%s/ResourceGroup/%s.php', ucfirst($resource_type), ucfirst($resource_group));
     include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/Formatter/%s.php', ucfirst($format));
     
@@ -55,6 +56,7 @@ class resourceActions extends sfActions
     {
       throw new InvalidArgumentException(sprintf('Search class "%s" does not exist for "%s/%s" resource group', $resource_group_class, $resource_type, $resource_group));
     }
+    // TODO : lucene index must be configurable
     $resource_group_instance = new $resource_group_class($this->getContext()->getEventDispatcher(), sfLucene::getInstance('IndexA', 'fr'));
     $raw_results = $resource_group_instance->search($request->getParameterHolder());
     

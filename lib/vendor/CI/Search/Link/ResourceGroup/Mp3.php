@@ -1,34 +1,11 @@
 <?php
-class CI_Search_Link_ResourceGroup_Mp3
-{
-  protected $event_dispatcher;
-  protected $lucene;
-  
-  public function __construct(sfEventDispatcher $dispatcher, sfLucene $lucene)
+class CI_Search_Link_ResourceGroup_Mp3 extends CI_Search_Link_ResourceGroup
+{ 
+  protected function buildLuceneCriteria(sfParameterHolder $parameters)
   {
-    $this->event_dispatcher = $dispatcher;
-    $this->lucene = $lucene;
-  }
-  
-  public function search(sfParameterHolder $parameters)
-  {
-    $c = new sfLuceneCriteria();
-    $c
-      ->addField('mime_type', 'audio/mpeg')
-      ->setLimit($parameters->get('limit', 50));
-
-    // retrieve the results
-    $sf_lucene_results = $this->lucene->friendlyFind($c);
-
-    $array_results = array();
-    foreach ($sf_lucene_results as $result)
-    {
-      $url_field = $result->getResult()->getField('url');
-      $array_results[] = array(
-        'url' => $url_field['value']
-      );
-    }
+    $c = parent::buildLuceneCriteria($parameters);
+    $c->addField('mime_type', 'audio/mpeg');
     
-    return $array_results;
+    return $c;
   }
 }
