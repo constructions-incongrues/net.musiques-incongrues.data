@@ -7,3 +7,4 @@ config/solr/*
 lib/model/doctrine/base/*
 lib/filter/doctrine/base/*
 lib/form/doctrine/base/*
+web/sf
