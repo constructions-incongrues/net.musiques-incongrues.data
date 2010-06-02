@@ -4,3 +4,6 @@ cache/*
 data/solr_index
 data/sql
 config/solr/*
+lib/model/doctrine/base/*
+lib/filter/doctrine/base/*
+lib/form/doctrine/base/*
