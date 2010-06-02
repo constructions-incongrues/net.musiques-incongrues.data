@@ -27,6 +27,8 @@ class CI_Search_Link_ResourceGroup
   protected function buildLuceneCriteria(sfParameterHolder $parameters)
   {
     $c = new sfLuceneCriteria();
+    
+    // Define which fields will be fetched
     $schema_fields =  $this->getSearchModelFields();
     foreach ($parameters->getAll() as $name => $value)
     {
@@ -35,8 +37,22 @@ class CI_Search_Link_ResourceGroup
         $c->addField($name, $value);
       }
     }
+    
+    // Define limit
     $c->setLimit($parameters->get('limit', 50));
     
+    // Define sorting
+    $sorting_direction = $parameters->get('sort_direction', 'asc');
+    if ($sorting_direction == 'desc')
+    {
+      $sort_method = 'addDescendingSortBy';
+    }
+    else
+    {
+      $sort_method = 'addAscendingSortBy';
+    }
+    $c->$sort_method($parameters->get('sort_field', 'contributed_at'));
+
     return $c;
   }
   
