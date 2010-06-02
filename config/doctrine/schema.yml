@@ -19,7 +19,8 @@ Link:
     mime_type: 
       type:    string
     contributed_at:
-      type:    datetime
+      # Makes it easier to comply with solr date format
+      type:    string 
     contributor_id:
       type:    integer
     contributor_name:

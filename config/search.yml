@@ -12,6 +12,7 @@ IndexA:
           stored:    true
         contributed_at:
           stored:    true
+          type:      date
         contributor_id:
           stored:    true
           type:      int

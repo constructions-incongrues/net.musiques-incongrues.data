@@ -39,6 +39,7 @@ class resourceActions extends sfActions
   public function executeGet(sfWebRequest $request)
   {
     // TODO : a good place to learn about dependency injection ?
+    // TODO : "q" query parameter makes it possible to directly query solr (no sfLuceneCriteria)
     
     // Gather meaningful parameters
     $resource_type = $request->getParameter('type', 'unknown');
@@ -96,5 +97,5 @@ class resourceActions extends sfActions
     
     // Select template
     return ucfirst($format);
-  }
+  }  
 }
