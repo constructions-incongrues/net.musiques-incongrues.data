@@ -26,7 +26,7 @@ resources:
   url:    /resources
   param: { module: resource, action: types }
 
-# Homeage
+# Homepage
 homepage:
   url:    /
   param: { module: resource, action: types }
