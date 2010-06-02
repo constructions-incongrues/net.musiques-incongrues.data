@@ -1,0 +1,1 @@
+<p>Ce groupe de resource est constitué de tous les liens pointant vers des images.</p>

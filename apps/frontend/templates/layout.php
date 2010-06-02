@@ -9,6 +9,7 @@
     <?php include_javascripts() ?>
   </head>
   <body>
+  	<h1><?php echo link_to('data.musiques-incongrues.net', '@homepage', array('title' => "Retourner à la page d'accueil")) ?></h1>
     <?php echo $sf_content ?>
   </body>
 </html>

@@ -39,7 +39,12 @@ class CI_Search_Link_ResourceGroup
     }
     
     // Define limit
-    $c->setLimit($parameters->get('limit', 50));
+    $limit = $parameters->get('limit', 50);
+    if ($limit == '-1')
+    {
+      $limit = '666666666';
+    }
+    $c->setLimit($limit);
     
     // Define sorting
     $sorting_direction = $parameters->get('sort_direction', 'asc');

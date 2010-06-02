@@ -1,0 +1,1 @@
+<p>Cette collection regroupe tous les liens postés sur le forum.</p>
