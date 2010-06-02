@@ -27,6 +27,14 @@ class CI_Search_Link_ResourceGroup
   protected function buildLuceneCriteria(sfParameterHolder $parameters)
   {
     $c = new sfLuceneCriteria();
+    $schema_fields =  $this->getSearchModelFields();
+    foreach ($parameters->getAll() as $name => $value)
+    {
+      if (in_array($name, $schema_fields))
+      {
+        $c->addField($name, $value);
+      }
+    }
     $c->setLimit($parameters->get('limit', 50));
     
     return $c;
@@ -34,16 +42,30 @@ class CI_Search_Link_ResourceGroup
   
   protected function buildResultsArray(sfLuceneResults $results_lucene)
   {
+    $schema_fields = $this->getSearchModelFields();
+    
     $results_array = array();
     foreach ($results_lucene as $result)
     {
-      $url_field = $result->getResult()->getField('url');
-      $results_array[] = array(
-        'url' => $url_field['value']
-      );
+      $result_array = array();
+      foreach ($schema_fields as $schema_field_name)
+      {
+        $result_field = $result->getResult()->getField($schema_field_name);
+        $result_array[$schema_field_name] = $result_field['value'];
+      }
+      $results_array[] = $result_array;
     }
-
+   
     return $results_array;
+  }
+  
+  private function getSearchModelFields()
+  {
+    // TODO : Get config info from lucene instance
+    $solr_config = sfLucene::getConfig();
+    $schema_fields = $solr_config['IndexA']['models']['Link']['fields'];
+    
+    return array_keys($schema_fields);
   }
   
 }
