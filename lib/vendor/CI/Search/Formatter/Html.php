@@ -1,8 +1,8 @@
 <?php
-class CI_Search_Formatter_Json
+class CI_Search_Formatter_Html
 {
-  public $content_type = 'application/json';
-  public $sf_has_layout = false;
+  public $content_type = 'text/html';
+  public $sf_has_layout = 'layout';
   
   protected $event_dispatcher;
   
@@ -13,6 +13,6 @@ class CI_Search_Formatter_Json
   
   public function format(array $resources)
   {
-    return json_encode($resources);
+    return $resources;
   }
 }

@@ -1,12 +1,10 @@
 <?php
 
 /**
- * resource actions.
+ * Actions for the "frontend/resource" module.
  *
- * @package    vanilla-miner
- * @subpackage resource
- * @author     Your name here
- * @version    SVN: $Id: actions.class.php 23810 2009-11-12 11:07:44Z Kris.Wallsmith $
+ * @package    VanillaMiner
+ * @subpackage Frontend
  */
 class resourceActions extends sfActions
 {
@@ -40,140 +38,57 @@ class resourceActions extends sfActions
   
   public function executeGet(sfWebRequest $request)
   {
+    // TODO : a good place to learn about dependency injection ?
+    
+    // Gather meaningful parameters
+    $resource_type = $request->getParameter('type', 'unknown');
+    $resource_group = $request->getParameter('group', 'all');
+    $format = $request->getParameter('format', 'html');
+    
+    // TODO : autoload those clases
+    include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/%s/ResourceGroup/%s.php', ucfirst($resource_type), ucfirst($resource_group));
+    include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/Formatter/%s.php', ucfirst($format));
+    
     // Get results from selected resource group
-    $resource_group_class  = sprintf('CI_Search_Resource_%s', ucfirst($request->getParameter('group', 'all')));
-    $resource_group = new $resource_group_class($this->getContext()->getEventDispatcher(), sfLucene::getInstance('IndexA', 'fr'));
-    $raw_results = $resource_group->search($request->getParameterHolder()->getAll());
+    $resource_group_class  = sprintf('CI_Search_%s_ResourceGroup_%s', ucfirst($resource_type), ucfirst($resource_group));
+    if (!class_exists($resource_group_class))
+    {
+      throw new InvalidArgumentException(sprintf('Search class "%s" does not exist for "%s/%s" resource group', $resource_group_class, $resource_type, $resource_group));
+    }
+    $resource_group_instance = new $resource_group_class($this->getContext()->getEventDispatcher(), sfLucene::getInstance('IndexA', 'fr'));
+    $raw_results = $resource_group_instance->search($request->getParameterHolder());
+    
+    // Make sure results are unique (TODO : this should go in search class)
+    // see http://www.php.net/manual/en/function.array-unique.php#91134
+    // TODO : it sucks as it makes the "limit" parameter not trustable
+    $raw_results_unique = array();
+    foreach ($raw_results as $result)
+    {
+      $raw_results_unique[md5($result['url'])] = $result;
+    }
+    $raw_results = $raw_results_unique;
     
     // Format results
-    $formatter_class = sprintf('CI_Search_Formatter_%s', ucfirst($request->getParameter('format', 'html')));
+    $formatter_class = sprintf('CI_Search_Formatter_%s', ucfirst($format));
+    if (!class_exists($formatter_class))
+    {
+      throw new InvalidArgumentException(sprintf('Formatter class "%s" does not exist for format "%s"', $formatter_class, $format));
+    }
     $formatter = new $formatter_class($this->getContext()->getEventDispatcher());
-    $results = $formatter->format($raw_results, $request, $response);
+    $results = $formatter->format($raw_results);
+    
+    // Tweak response depending on formatter
+    $this->getResponse()->setContentType($formatter->content_type);
+    $this->setLayout($formatter->sf_has_layout);
+    if (!$formatter->sf_has_layout)
+    {
+      sfConfig::set('sf_web_debug', false);
+    }
     
     // Pass results to view
     $this->results = $results;
     
     // Select template
-    return ucfirst($request->getParameter('format', 'html'));
-    
-    $resources_getter = array($this, sprintf('get%s', ucfirst($request->getParameter('group'))));
-    $resources = call_user_func($resources_getter, $request);
-    $results = call_user_func(array($this, sprintf('format%s', ucfirst($request->getParameter('format', 'html')))), $resources, $request, $this->getResponse());
-    $this->results = $results;
-    
-    return ucfirst($request->getParameter('format', 'html'));
-  }
-  
-  public function getImages(sfWebRequest $request)
-  {
-    $c = new sfLuceneCriteria();
-    $c
-      ->addField('mime_type', 'image')
-      ->setLimit($request->getParameter('limit', 50));
-
-    // retrieve the lucene instance
-    $lucene = sfLucene::getInstance('IndexA', 'fr');
-
-    // retrieve the results
-    $sf_lucene_results = $lucene->friendlyFind($c);
-
-    $array_results = array();
-    foreach ($sf_lucene_results as $result)
-    {
-      $url_field = $result->getResult()->getField('url');
-      $array_results[] = array(
-        'url' => $url_field['value']
-      );
-    }
-    
-    return $array_results;
-  }
-  
-  public function getMp3(sfWebRequest $request)
-  {
-    $c = new sfLuceneCriteria();
-    $c
-      ->addField('mime_type', 'audio/mpeg')
-      ->setLimit($request->getParameter('limit', 50));
-
-    // retrieve the lucene instance
-    $lucene = sfLucene::getInstance('IndexA', 'fr');
-
-    // retrieve the results
-    $sf_lucene_results = $lucene->friendlyFind($c);
-
-    $array_results = array();
-    foreach ($sf_lucene_results as $result)
-    {
-      $url_field = $result->getResult()->getField('url');
-      $array_results[] = array(
-        'url' => $url_field['value']
-      );
-    }
-    
-    return $array_results;
-  }
-
-  public function getYoutube(sfWebRequest $request)
-  {
-    $c = new sfLuceneCriteria();
-    $c
-      ->addField('domain_parent', 'youtube.com')
-      ->setLimit($request->getParameter('limit', 50));
-
-    // retrieve the lucene instance
-    $lucene = sfLucene::getInstance('IndexA', 'fr');
-
-    // retrieve the results
-    $sf_lucene_results = $lucene->friendlyFind($c);
-
-    $array_results = array();
-    foreach ($sf_lucene_results as $result)
-    {
-      $url_field = $result->getResult()->getField('url');
-      $array_results[] = array(
-        'url' => $url_field['value']
-      );
-    }
-    
-    if ($request->getParameter('sf_format') == 'json')
-    {
-      $array_results = json_encode($array_results);
-    }
-    
-    return $array_results;
-  }
-
-  public function formatHtml(array $resources, sfWebRequest $request, sfWebResponse $response)
-  {
-    return $resources;
-  }
-  
-  public function formatXspf(array $resources, sfWebRequest $request, sfWebResponse $response)
-  {
-    $response->setContentType('application/xspf+xml');
-//    $response->setContentType('text/xml');
-    sfConfig::set('sf_web_debug', false);
-    $this->setLayout(false);
-    error_reporting(E_ALL);
-    require 'File/XSPF.php';
-    $playlist = new File_XSPF();
-    foreach ($resources as $resource)
-    {
-      $track_location = new File_XSPF_Location();
-      $track_location->setUrl($resource['url']);
-      $track = new File_XSPF_Track();
-      $track->addLocation($track_location);
-      $playlist->addTrack($track);
-    }
-    return $playlist;
-  }
-  
-  public function formatJson(array $resources, sfWebRequest $request, sfWebResponse $response)
-  {
-    $response->setContentType('application/json');
-    sfConfig::set('sf_web_debug', false);
-    $this->setLayout(false);
-    return json_encode($resources);
+    return ucfirst($format);
   }
 }
