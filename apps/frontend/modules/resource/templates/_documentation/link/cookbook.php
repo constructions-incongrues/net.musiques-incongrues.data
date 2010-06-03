@@ -9,7 +9,7 @@ else
 }
 ?>
 
-<h3>Récupération de 5 liens vers des MP3, par ordre décroissant de date de contribution, au format XSPF</h3>
+<h3 id="exemple-1">Récupération de 5 liens vers des MP3, par ordre décroissant de date de contribution, au format XSPF</h3>
 
 <h4>Requête</h4>
 <pre>GET <?php echo $prefix ?>/collections/link/segments/mp3/get?limit=5&amp;sort_direction=desc&amp;sort_field=contributed_at&amp;format=xspf</pre>
@@ -38,7 +38,7 @@ else
 </playlist>')
 ?></pre>
 
-<h3>Récupération du premier lien posté vers une vidéo Youtube par l'utilisateur "mbertier", au format Json</h3>
+<h3 id="exemple-2">Récupération du premier lien posté vers une vidéo Youtube par l'utilisateur "mbertier", au format Json</h3>
 
 <h4>Requête</h4>
 <pre>GET <?php echo $prefix?>/collections/link/segments/youtube/get?limit=1&amp;sort_direction=asc&amp;sort_field=contributed_at&amp;contributor_name=mbertier&amp;format=json</pre>
@@ -61,7 +61,7 @@ else
 ]')
 ?></pre>
 
-<h3>Récupération de toutes les vidéos du topic "Des clips, des clips, rien que des clips", au format PHP sérialisé</h3>
+<h3 id="exemple-3">Récupération de toutes les vidéos du topic "Des clips, des clips, rien que des clips", au format PHP sérialisé</h3>
 
 <h4>Requête</h4>
 <pre>GET <?php echo $prefix?>/collections/link/segments/youtube/get?limit=-1&amp;discusion_id=1679&amp;format=php</pre>

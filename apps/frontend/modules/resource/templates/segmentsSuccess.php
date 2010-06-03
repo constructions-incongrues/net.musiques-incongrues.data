@@ -1,18 +1,33 @@
-<h2>Documentation de la collection</h2>
-<h3>Schema</h3>
-<?php include_partial(sprintf('resource/documentation/%s/schema', $sf_request->getParameter('collection'))) ?>
+<style>
+div#toc ul {
+    list-style: none;
+}
+div#toc ul li ul {
+    margin-bottom: 0.75em;
+}
+div#toc ul li ul li ul {
+    margin-bottom: 0.25em;
+}
+</style>
+<div id="documentation-container">
+<h2 id="documentation">Documentation de la collection</h2>
 
-<h2>Segments</h2>
-
-<?php foreach ($segments as $segment): ?>
-  <h3><?php echo $segment ?></h3>
-  <?php include_partial(sprintf('resource/documentation/%s/segment/%s', $sf_request->getParameter('collection'), $segment)); ?>
-  <?php echo link_to('Accéder au groupe', sprintf('@resources_collection_segment_formats?collection=%s&segment=%s', $sf_request->getParameter('collection'), $segment)) ?>
-<?php endforeach; ?>
+<div id="toc"></div>
 
 
-<h2>Exemples</h2>
-<?php include_partial(sprintf('resource/documentation/%s/cookbook', $sf_request->getParameter('collection'))); ?>
+  <h3 id="schema">Schema</h3>
+  <?php include_partial(sprintf('resource/documentation/%s/schema', $sf_request->getParameter('collection'))) ?>
 
-<h2>TODO : Essayer </h2>
-<!-- jquery live tester -->
+  <h3 id="segments">Segments disponibles</h3>
+
+  <?php foreach ($segments as $segment): ?>
+    <h4 id="segment-<?php echo $segment?>"><?php echo $segment ?></h4>
+    <?php include_partial(sprintf('resource/documentation/%s/segment/%s', $sf_request->getParameter('collection'), $segment)); ?>
+    <p>URL de requête :</p>
+    <pre>GET <?php echo url_for(sprintf('@resources_collection_segment_get?collection=%s&segment=%s', $sf_request->getParameter('collection'), $segment), true) ?></pre>
+  <?php endforeach; ?>
+
+
+  <h2 id="examples">Exemples</h2>
+  <?php include_partial(sprintf('resource/documentation/%s/cookbook', $sf_request->getParameter('collection'))); ?>
+</div>
