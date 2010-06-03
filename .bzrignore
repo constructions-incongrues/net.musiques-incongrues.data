@@ -8,3 +8,5 @@ lib/model/doctrine/base/*
 lib/filter/doctrine/base/*
 lib/form/doctrine/base/*
 web/sf
+config/databases.yml
+web/index.php

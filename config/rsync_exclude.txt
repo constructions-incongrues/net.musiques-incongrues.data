@@ -2,7 +2,9 @@
 /cache/*
 /log/*
 /web/*_dev.php
+/config/databases.yml
 /web/uploads/*
+/web/index.php
 
 # SCM files
 .arch-params
