@@ -1,4 +1,13 @@
-<?php $prefix = sprintf('%s%s', $sf_request->getUriPrefix(), $sf_request->getScriptName()) ?>
+<?php 
+if (sfConfig::get('sf_no_script_name'))
+{
+  $prefix = $sf_request->getUriPrefix();
+}
+else
+{
+  $prefix = sprintf('%s%s', $sf_request->getUriPrefix(), $sf_request->getScriptName());
+}
+?>
 
 <h3>Récupération de 5 liens vers des MP3, par ordre décroissant de date de contribution, au format XSPF</h3>
 

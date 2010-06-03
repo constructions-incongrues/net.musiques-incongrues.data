@@ -10,3 +10,5 @@ lib/form/doctrine/base/*
 web/sf
 config/databases.yml
 web/index.php
+web/sfDoctrinePlugin
+web/sfSolrPlugin
