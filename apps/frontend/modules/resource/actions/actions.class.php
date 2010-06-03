@@ -14,26 +14,26 @@ class resourceActions extends sfActions
     $this->types = $types;
   }
   
-  public function executeShow(sfWebRequest $request)
+  public function executeSegments(sfWebRequest $request)
   {
-    $groups = array();
+    $segments = array();
     if ($resource_parameters = sfConfig::get(sprintf('app_resources_%s', $request->getParameter('type')), false))
     {
-      $groups = $resource_parameters['groups'];
+      $segments = $resource_parameters['segments'];
     }
 
-    $this->groups = $groups;
+    $this->segments = $segments;
   }
   
   public function executeFormats(sfWebRequest $request)
   {
-    $group_formats = array();
+    $segment_formats = array();
     if ($resource_parameters = sfConfig::get(sprintf('app_resources_%s', $request->getParameter('type')), false))
     {
-      $group_formats = $resource_parameters[$request->getParameter('group')]['formats'];
+      $segment_formats = $resource_parameters[$request->getParameter('segment')]['formats'];
     }
 
-    $this->formats = $group_formats;
+    $this->formats = $segment_formats;
   }
   
   public function executeGet(sfWebRequest $request)
@@ -43,23 +43,23 @@ class resourceActions extends sfActions
     
     // Gather meaningful parameters
     $resource_type = $request->getParameter('type', 'unknown');
-    $resource_group = $request->getParameter('group', 'all');
+    $resource_segment = $request->getParameter('segment', 'all');
     $format = $request->getParameter('format', 'html');
     
     // TODO : autoload those clases
-    include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/%s/ResourceGroup.php', ucfirst($resource_type));
-    include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/%s/ResourceGroup/%s.php', ucfirst($resource_type), ucfirst($resource_group));
+    include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/%s/Segment.php', ucfirst($resource_type));
+    include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/%s/Segment/%s.php', ucfirst($resource_type), ucfirst($resource_segment));
     include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/Formatter/%s.php', ucfirst($format));
     
-    // Get results from selected resource group
-    $resource_group_class  = sprintf('CI_Search_%s_ResourceGroup_%s', ucfirst($resource_type), ucfirst($resource_group));
-    if (!class_exists($resource_group_class))
+    // Get results from selected resource segment
+    $resource_segment_class  = sprintf('CI_Search_%s_Segment_%s', ucfirst($resource_type), ucfirst($resource_segment));
+    if (!class_exists($resource_segment_class))
     {
-      throw new InvalidArgumentException(sprintf('Search class "%s" does not exist for "%s/%s" resource group', $resource_group_class, $resource_type, $resource_group));
+      throw new InvalidArgumentException(sprintf('Search class "%s" does not exist for "%s/%s" resource segment', $resource_segment_class, $resource_type, $resource_segment));
     }
     // TODO : lucene index must be configurable
-    $resource_group_instance = new $resource_group_class($this->getContext()->getEventDispatcher(), sfLucene::getInstance('IndexA', 'fr'));
-    $raw_results = $resource_group_instance->search($request->getParameterHolder());
+    $resource_segment_instance = new $resource_segment_class($this->getContext()->getEventDispatcher(), sfLucene::getInstance('IndexA', 'fr'));
+    $raw_results = $resource_segment_instance->search($request->getParameterHolder());
     
     // Make sure results are unique (this a just a hack)
     // see http://www.php.net/manual/en/function.array-unique.php#91134

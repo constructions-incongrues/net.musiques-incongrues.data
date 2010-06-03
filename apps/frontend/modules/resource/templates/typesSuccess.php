@@ -4,9 +4,9 @@ par les contributeurs du <a href="http://www.musiques-incongrues.net">forum des 
 </p>
 
 <p>
-Le site met à votre disposition des <strong>collections de ressources</strong> qui peuvent être requêtées selon différent critères.<br />
+Le site met à votre disposition des <strong>collections</strong> de <strong>ressources</strong> qui peuvent être requêtées selon différent critères.<br />
 La réponse à chaque requête pourra être obtenue sous différent <strong>formats</strong>, en fonction du besoin.<br />
-Pour faciliter le travail d'exploitation, le service propose des <strong>groupes de ressources</strong> prédéfinis, 
+Pour faciliter le travail d'exploitation, le service propose des <strong>segments de ressources</strong> prédéfinis, 
 dépendants des collections de ressources. 
 </p>
 
@@ -16,8 +16,8 @@ ainsi qu'à une série d'exemples de requêtage.
 </p>
 
 <h2>Collections de ressources</h2>
-<h3>Liens</h3>
 <?php foreach ($types as $type): ?>
+  <h3><?php echo $type ?></h3>
   <?php include_partial(sprintf('resource/documentation/%s/description', $type)) ?>
   <?php echo link_to('Accéder à la collection', '@resources_type?type='.$type) ?>
 <?php endforeach; ?>

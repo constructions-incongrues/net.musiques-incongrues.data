@@ -1,1 +1,0 @@
-<p>Ce groupe de resource est constitué de tous les liens, sans exception.</p>

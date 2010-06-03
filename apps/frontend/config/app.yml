@@ -6,7 +6,7 @@ all:
   resources:
     types: [link]
     link:
-      groups:  [all, images, mp3, youtube]
+      segments:  [all, images, mp3, youtube]
       all:
         formats: [html, json]
       mp3:

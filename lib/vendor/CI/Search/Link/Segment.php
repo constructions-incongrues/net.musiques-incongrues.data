@@ -1,5 +1,5 @@
 <?php
-class CI_Search_Link_ResourceGroup
+class CI_Search_Link_Segment
 {
   protected $event_dispatcher;
   protected $lucene;

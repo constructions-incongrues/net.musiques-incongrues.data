@@ -1,26 +1,26 @@
 # You can find more information about this file on the symfony website:
 # http://www.symfony-project.org/reference/1_4/en/10-Routing
 
-# Returns group data depending on query parameters and required response format
-resources_type_group_get:
-  url:    /resources/:type/groups/:group/get
+# Returns segment data depending on query parameters and required response format
+resources_type_segment_get:
+  url:    /resources/:type/segments/:segment/get
   param: { module: resource, action: get, sf_format: html }
 
 # Shows available resource types for required resource type
-resources_type_group_formats:
-  url:    /resources/:type/groups/:group/formats
+resources_type_segment_formats:
+  url:    /resources/:type/segments/:segment/formats
   param: { module: resource, action: formats }
 
-# Shows available groups for required resource type
-resources_type_groups:
-  url:    /resources/:type/groups
-  param: { module: resource, action: groups }
+# Shows available segments for required resource type
+resources_type_segments:
+  url:    /resources/:type/segments
+  param: { module: resource, action: segments }
 
 # Shows documentation and drill down links for required resource type
 resources_type:
   url:    /resources/:type
-  param: { module: resource, action: show }
-  
+  param: { module: resource, action: segments }
+
 # Lists all available resources
 resources:
   url:    /resources
