@@ -34,7 +34,9 @@ class CI_Search_Link_Segment
     {
       if (in_array($name, $schema_fields))
       {
-        $c->addField($name, $value);
+        // NOTE : we need to set "force" (third parameter) to true because of a weird behaviof of sfLuceneCriteria escape checking.
+        // TODO : make sure that this is *not* an awful security risk
+        $c->addField($name, $value, sfLuceneCriteria::TYPE_AND, true);
       }
     }
     
