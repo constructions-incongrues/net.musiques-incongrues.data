@@ -1,5 +1,6 @@
 <h2>Documentation de la collection</h2>
-<p>TODO. Présentation du schema et des paramètres transverses.</p>
+<h3>Schema</h3>
+<?php include_partial(sprintf('resource/documentation/%s/schema', $sf_request->getParameter('type'))) ?>
 
 <h2>Segments</h2>
 
