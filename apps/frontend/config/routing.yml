@@ -2,31 +2,31 @@
 # http://www.symfony-project.org/reference/1_4/en/10-Routing
 
 # Returns segment data depending on query parameters and required response format
-resources_type_segment_get:
-  url:    /resources/:type/segments/:segment/get
+resources_collection_segment_get:
+  url:    /collections/:collection/segments/:segment/get
   param: { module: resource, action: get, sf_format: html }
 
-# Shows available resource types for required resource type
-resources_type_segment_formats:
-  url:    /resources/:type/segments/:segment/formats
+# Shows available response formats for required resource segment
+resources_collection_segment_formats:
+  url:    /collections/:collection/segments/:segment/formats
   param: { module: resource, action: formats }
 
-# Shows available segments for required resource type
-resources_type_segments:
-  url:    /resources/:type/segments
+# Shows available segments for required resource collection
+resources_collection_segments:
+  url:    /collections/:collection/segments
   param: { module: resource, action: segments }
 
-# Shows documentation and drill down links for required resource type
-resources_type:
-  url:    /resources/:type
+# Shows documentation and drill down links for required resource collection
+resources_collection:
+  url:    /collections/:collection
   param: { module: resource, action: segments }
 
 # Lists all available resources
 resources:
-  url:    /resources
-  param: { module: resource, action: types }
+  url:    /collections
+  param: { module: resource, action: collections }
 
 # Homepage
 homepage:
   url:    /
-  param: { module: resource, action: types }
+  param: { module: resource, action: collections }

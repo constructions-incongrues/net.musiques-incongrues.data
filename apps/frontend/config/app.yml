@@ -4,7 +4,7 @@
 # default values
 all:
   resources:
-    types: [link]
+    collections: [link]
     link:
       segments:  [all, images, mp3, youtube]
       all:

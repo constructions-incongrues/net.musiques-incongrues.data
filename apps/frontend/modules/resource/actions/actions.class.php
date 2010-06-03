@@ -8,16 +8,16 @@
  */
 class resourceActions extends sfActions
 {
-  public function executeTypes(sfWebRequest $request)
+  public function executeCollections(sfWebRequest $request)
   {
-    $types = sfConfig::get('app_resources_types', array());
-    $this->types = $types;
+    $collections = sfConfig::get('app_resources_collections', array());
+    $this->collections = $collections;
   }
   
   public function executeSegments(sfWebRequest $request)
   {
     $segments = array();
-    if ($resource_parameters = sfConfig::get(sprintf('app_resources_%s', $request->getParameter('type')), false))
+    if ($resource_parameters = sfConfig::get(sprintf('app_resources_%s', $request->getParameter('collection')), false))
     {
       $segments = $resource_parameters['segments'];
     }
@@ -28,7 +28,7 @@ class resourceActions extends sfActions
   public function executeFormats(sfWebRequest $request)
   {
     $segment_formats = array();
-    if ($resource_parameters = sfConfig::get(sprintf('app_resources_%s', $request->getParameter('type')), false))
+    if ($resource_parameters = sfConfig::get(sprintf('app_resources_%s', $request->getParameter('collection')), false))
     {
       $segment_formats = $resource_parameters[$request->getParameter('segment')]['formats'];
     }
@@ -42,20 +42,20 @@ class resourceActions extends sfActions
     // TODO : "q" query parameter makes it possible to directly query solr (no sfLuceneCriteria)
     
     // Gather meaningful parameters
-    $resource_type = $request->getParameter('type', 'unknown');
+    $resource_collection = $request->getParameter('collection', 'unknown');
     $resource_segment = $request->getParameter('segment', 'all');
     $format = $request->getParameter('format', 'html');
     
     // TODO : autoload those clases
-    include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/%s/Segment.php', ucfirst($resource_type));
-    include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/%s/Segment/%s.php', ucfirst($resource_type), ucfirst($resource_segment));
+    include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/%s/Segment.php', ucfirst($resource_collection));
+    include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/%s/Segment/%s.php', ucfirst($resource_collection), ucfirst($resource_segment));
     include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/Formatter/%s.php', ucfirst($format));
     
     // Get results from selected resource segment
-    $resource_segment_class  = sprintf('CI_Search_%s_Segment_%s', ucfirst($resource_type), ucfirst($resource_segment));
+    $resource_segment_class  = sprintf('CI_Search_%s_Segment_%s', ucfirst($resource_collection), ucfirst($resource_segment));
     if (!class_exists($resource_segment_class))
     {
-      throw new InvalidArgumentException(sprintf('Search class "%s" does not exist for "%s/%s" resource segment', $resource_segment_class, $resource_type, $resource_segment));
+      throw new InvalidArgumentException(sprintf('Search class "%s" does not exist for "%s/%s" resource segment', $resource_segment_class, $resource_collection, $resource_segment));
     }
     // TODO : lucene index must be configurable
     $resource_segment_instance = new $resource_segment_class($this->getContext()->getEventDispatcher(), sfLucene::getInstance('IndexA', 'fr'));

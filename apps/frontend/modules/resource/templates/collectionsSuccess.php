@@ -16,10 +16,10 @@ ainsi qu'à une série d'exemples de requêtage.
 </p>
 
 <h2>Collections de ressources</h2>
-<?php foreach ($types as $type): ?>
-  <h3><?php echo $type ?></h3>
-  <?php include_partial(sprintf('resource/documentation/%s/description', $type)) ?>
-  <?php echo link_to('Accéder à la collection', '@resources_type?type='.$type) ?>
+<?php foreach ($collections as $collection): ?>
+  <h3><?php echo $collection ?></h3>
+  <?php include_partial(sprintf('resource/documentation/%s/description', $collection)) ?>
+  <?php echo link_to('Accéder à la collection', '@resources_collection?collection='.$collection) ?>
 <?php endforeach; ?>
 
 <h2>Sous l'capot</h2>
