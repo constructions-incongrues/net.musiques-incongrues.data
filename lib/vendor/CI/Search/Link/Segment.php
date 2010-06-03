@@ -58,8 +58,9 @@ class CI_Search_Link_Segment
     {
       $sort_method = 'addAscendingSortBy';
     }
-    $sort_field = $parameters->get('sort_field', 'contributed_at');
+    
     // Take care of random sorting
+    $sort_field = $parameters->get('sort_field', 'contributed_at');
     if ($sort_field == 'random')
     {
       $sort_field = sprintf('random_%s', uniqid());
