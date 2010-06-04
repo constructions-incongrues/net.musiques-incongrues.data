@@ -10,7 +10,12 @@ class resourceActions extends sfActions
 {
   public function executeCollections(sfWebRequest $request)
   {
-    $collections = sfConfig::get('app_resources_collections', array());
+    $collections = array();
+    $collections_names = sfConfig::get('app_resources_collections', array());
+    foreach ($collections_names as $collection_name)
+    {
+      $collections[$collection_name] = array('count' => Doctrine::getTable(ucfirst($collection_name))->count());
+    }
     $this->collections = $collections;
   }
   

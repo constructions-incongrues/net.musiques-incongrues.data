@@ -16,10 +16,12 @@ ainsi qu'à une série d'exemples de requêtage.
 </p>
 
 <h2>Collections de ressources</h2>
-<?php foreach ($collections as $collection): ?>
-  <h3><?php echo $collection ?></h3>
-  <?php include_partial(sprintf('resource/documentation/%s/description', $collection)) ?>
-  <?php echo link_to('Consulter la documentation', '@resources_collection?collection='.$collection) ?>
+<?php foreach ($collections as $collection_name => $collection_data): ?>
+  <h3><?php echo $collection_name ?></h3>
+  <?php // TODO : data are not accessible in partial. WTF ? ?>
+  <?php include_partial(sprintf('resource/documentation/%s/description', $collection_name), array('collection_name' => $collection_name, 'collection_data' => $collection_data)) ?>
+  <p>À ce jour, cette collection regroupe <strong><?php echo $collection_data['count'] ?></strong> ressources.</p>
+  <p><?php echo link_to('Consulter la documentation', '@resources_collection?collection='.$collection_name) ?></p>
 <?php endforeach; ?>
 
 <h2>Sous l'capot</h2>

@@ -1,7 +1,11 @@
+<h1>Documentation de la collection "<?php echo $sf_request->getParameter('collection') ?>"</h1>
 <div id="documentation-container">
   <div id="toc">
     <!-- Holds dynamically generated (JavaScript) table of contents -->
   </div>
+
+  <h2 id="presentation">Présentation de la collection</h2>
+  <?php include_partial(sprintf('resource/documentation/%s/description', $sf_request->getParameter('collection'))) ?>
 
   <h2 id="howto">Comment constituer une requête ?</h2>
   <?php include_partial('resource/documentation/howto') ?>
