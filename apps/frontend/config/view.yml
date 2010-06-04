@@ -12,7 +12,7 @@ default:
     #language:     en
     #robots:       index, follow
 
-  stylesheets:    [main.css?v=1]
+  stylesheets:    ["main.css?v=1"]
 
   javascripts:    ["http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js", "http://samaxesjs.googlecode.com/files/jquery.toc-1.1.0.min.js", "behaviors.js?v=1"]
 
