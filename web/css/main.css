@@ -1,9 +1,20 @@
-div#toc ul {
-    list-style: none;
-}
-div#toc ul li ul {
-    margin-bottom: 0.75em;
-}
-div#toc ul li ul li ul {
-    margin-bottom: 0.25em;
-}
+body { margin: 0; text-align: center; font-size: large; font-family: "Crimson Text"; }
+h1, h2 { font-family: "Lobster"; }
+h1 { text-align: center }
+pre { padding: 1em; }
+dl { margin-left: 1em; }
+dt { font-weight: bold; }
+a { color: #666; }
+a:hover { background-color: yellow; }
+
+div#toc ul { list-style: none; }
+div#toc ul li ul { margin-bottom: 0.75em; }
+div#toc ul li ul li ul { margin-bottom: 0.25em; }
+
+div#container { margin-left: auto; margin-right: auto; text-align: left; }
+div#container.large { width: 80% }
+div#container.narrow { width: 50% }
+div#presentation { text-align: justify; }
+div#toc { background-color: #eee; padding: 1em; }
+
+p#url { display: none; text-align: center; }

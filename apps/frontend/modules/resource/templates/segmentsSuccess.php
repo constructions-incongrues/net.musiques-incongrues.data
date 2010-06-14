@@ -1,4 +1,12 @@
-<h1>Documentation de la collection "<?php echo $sf_request->getParameter('collection') ?>"</h1>
+<?php
+use_javascript('http://shjs.sourceforge.net/sh_main.min.js');
+use_javascript('http://shjs.sourceforge.net/lang/sh_javascript.min.js');
+use_javascript('http://shjs.sourceforge.net/lang/sh_xml.min.js');
+use_javascript('http://shjs.sourceforge.net/lang/sh_php.min.js');
+use_stylesheet('http://shjs.sourceforge.net/css/sh_acid.min.css');
+?>
+<div id="container" class="large">
+<h2>Documentation de la collection "<?php echo $sf_request->getParameter('collection') ?>"</h2>
 <div id="documentation-container">
   <div id="toc">
     <!-- Holds dynamically generated (JavaScript) table of contents -->
@@ -30,4 +38,5 @@
     <p>URL de requête :</p>
     <pre>GET <?php echo url_for(sprintf('@resources_collection_segment_get?collection=%s&segment=%s', $sf_request->getParameter('collection'), $segment), true) ?></pre>
   <?php endforeach; ?>
+</div>
 </div>
