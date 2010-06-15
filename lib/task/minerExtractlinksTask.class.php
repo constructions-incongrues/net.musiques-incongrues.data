@@ -19,10 +19,10 @@ class minerExtractlinksTask extends sfBaseTask
     $this->name             = 'extract-links';
     $this->briefDescription = '';
     $this->detailedDescription = <<<EOF
-The [miner:extract-links|INFO] task does things.
+The [miner:extract-links|INFO] extracts links in comments from supplied Lussumo Vanilla database comments.
 Call it with:
 
-  [php symfony miner:extract-links|INFO]
+  [php symfony miner:extract-links "driver://user:pass@host/dbname"|INFO]
 EOF;
   }
 
@@ -57,6 +57,7 @@ EOF;
     // Extract links from each comment
     $comments_parsed = 0;
 
+    // Instanciate progress bar, if user requested so
     if ($options['progress'])
     {
       include 'Console/ProgressBar.php';
