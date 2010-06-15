@@ -1,15 +1,26 @@
 <?php
 class CI_Search_Link_Segment
 {
+  /**
+   * @var sfEventDispatcher
+   */
   protected $event_dispatcher;
+
+  /**
+   * @var sfLucene
+   */
   protected $lucene;
 
+  /**
+   * @param sfEventDispatcher $dispatcher
+   * @param sfLucene          $lucene
+   */
   public function __construct(sfEventDispatcher $dispatcher, sfLucene $lucene)
   {
     $this->event_dispatcher = $dispatcher;
     $this->lucene = $lucene;
   }
-  
+
   public function search(sfParameterHolder $parameters)
   {
     // Build search criteria from request parameters
@@ -20,14 +31,14 @@ class CI_Search_Link_Segment
 
     // Build results array
     $results_array = $this->buildResultsArray($results_lucene);
-    
+
     return $results_array;
   }
-  
+
   protected function buildLuceneCriteria(sfParameterHolder $parameters)
   {
     $c = new sfLuceneCriteria();
-    
+
     // Define which fields will be fetched
     $schema_fields =  $this->getSearchModelFields();
     foreach ($parameters->getAll() as $name => $value)
@@ -39,7 +50,7 @@ class CI_Search_Link_Segment
         $c->addField($name, $value, sfLuceneCriteria::TYPE_AND, true);
       }
     }
-    
+
     // Define limit
     $limit = $parameters->get('limit', 50);
     if ($limit == '-1')
@@ -47,7 +58,7 @@ class CI_Search_Link_Segment
       $limit = '666666666';
     }
     $c->setLimit($limit);
-    
+
     // Define sorting
     $sorting_direction = $parameters->get('sort_direction', 'asc');
     if ($sorting_direction == 'desc')
@@ -58,7 +69,7 @@ class CI_Search_Link_Segment
     {
       $sort_method = 'addAscendingSortBy';
     }
-    
+
     // Take care of random sorting
     $sort_field = $parameters->get('sort_field', 'contributed_at');
     if ($sort_field == 'random')
@@ -69,11 +80,11 @@ class CI_Search_Link_Segment
 
     return $c;
   }
-  
+
   protected function buildResultsArray(sfLuceneResults $results_lucene)
   {
     $schema_fields = $this->getSearchModelFields();
-    
+
     $results_array = array();
     foreach ($results_lucene as $result)
     {
@@ -85,17 +96,17 @@ class CI_Search_Link_Segment
       }
       $results_array[] = $result_array;
     }
-   
+
     return $results_array;
   }
-  
+
   private function getSearchModelFields()
   {
     // TODO : Get config info from lucene instance
     $solr_config = sfLucene::getConfig();
     $schema_fields = $solr_config['IndexA']['models']['Link']['fields'];
-    
+
     return array_keys($schema_fields);
   }
-  
+
 }
