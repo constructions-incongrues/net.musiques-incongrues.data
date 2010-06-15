@@ -31,3 +31,9 @@ Link:
       type:    integer
     discussion_name:
       type:    string
+  indexes:
+    url_index:
+      fields:
+        url:
+          length: 512
+      type:   unique
