@@ -17,11 +17,11 @@ class CI_Extractor_LussumoVanilla1 extends CI_Extractor
    */
   protected function getResources($dsn_source)
   {
-    // TODO : do not select whispered and deleted comments
     $q = 'select c.CommentID, c.Body, c.DateCreated, c.AuthUserID, c.DiscussionID, d.Name as DiscussionName, u.Name
     	from LUM_Comment c
     	inner join LUM_User u on c.AuthUserID = u.UserID
-    	inner join LUM_Discussion d on c.DiscussionID = d.DiscussionID';
+    	inner join LUM_Discussion d on c.DiscussionID = d.DiscussionID
+    	where c.Deleted != 1 and c.WhisperUserID = 0';
 
     return $this->getConnection($dsn_source)->fetchAssoc($q);
   }
@@ -76,8 +76,7 @@ class CI_Extractor_LussumoVanilla1 extends CI_Extractor
    */
   public function countResources($dsn)
   {
-    // TODO : do not select whispered and deleted comments
-    $q = 'select count(c.CommentID) from LUM_Comment c';
+    $q = 'select count(c.CommentID) from LUM_Comment c where c.Deleted != 1 and c.WhisperUserID = 0';
 
     return (int)$this->getConnection($dsn)->fetchOne($q);
   }
