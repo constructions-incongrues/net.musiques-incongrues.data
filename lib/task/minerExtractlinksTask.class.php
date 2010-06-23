@@ -63,31 +63,38 @@ EOF;
     $resources_parsed = 0;
     $resources_total = $extractor->countResources($arguments['dsn']);
 
-    // Instanciate an configure progress bar
-    if ($options['progress'])
+    if ($resources_total > 0)
     {
-      include 'Console/ProgressBar.php';
-      $progress_bar = new Console_ProgressBar(
-        '** '.$arguments['dsn'].' %fraction% resources [%bar%] %percent% | ',
-        '=>', '-', 80, $resources_total, array('ansi_terminal' => true)
-      );
-    }
-
-    // Extract resources from source and insert them in Links database
-    while ($resource_extraction_info = $extractor->extract($arguments['dsn'], $options['connection']))
-    {
-      // Update extraction statistics
-      $urls_found_count += $resource_extraction_info['urls_found_count'];
-
-      // Update progress bar
+      // Instanciate an configure progress bar
       if ($options['progress'])
       {
-        $progress_bar->update($resource_extraction_info['resources_parsed_count']);
+        include 'Console/ProgressBar.php';
+        $progress_bar = new Console_ProgressBar(
+          '** '.$arguments['dsn'].' %fraction% resources [%bar%] %percent% | ',
+          '=>', '-', 80, $resources_total, array('ansi_terminal' => true)
+        );
       }
-    }
 
-    // Log
-    $this->logSection('extract', sprintf('%d URLs where extracted from %d resources', $urls_found_count, $resources_total));
+      // Extract resources from source and insert them in Links database
+      while ($resource_extraction_info = $extractor->extract($arguments['dsn'], $options['connection']))
+      {
+        // Update extraction statistics
+        $urls_found_count += $resource_extraction_info['urls_found_count'];
+
+        // Update progress bar
+        if ($options['progress'])
+        {
+          $progress_bar->update($resource_extraction_info['resources_parsed_count']);
+        }
+      }
+
+      // Log
+      $this->logSection('extract', sprintf('%d URLs where extracted from %d resources', $urls_found_count, $resources_total));
+    }
+    else
+    {
+      $this->logSection('extract', 'No resources to extract. Exiting.');
+    }
   }
 
   /**

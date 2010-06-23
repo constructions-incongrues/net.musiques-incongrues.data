@@ -31,9 +31,21 @@ Link:
       type:    integer
     discussion_name:
       type:    string
+    # available, unavailable, unknown
+    availability:
+      type:    string
+      default: 'unknown'
+    expanded_at:
+      type:    timestamp
   indexes:
-    url_index:
+    idx_url:
       fields:
         url:
           length: 512
       type:   unique
+    idx_expanded_at:
+      fields: [expanded_at]
+    idx_availability:
+      fields: 
+        availability:
+          length: 11
