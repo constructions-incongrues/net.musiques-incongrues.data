@@ -1,136 +1,104 @@
 <?php
 
+/**
+ * Symfony task for extracting urls using an extraction drivers.
+ * Extracted urls will be added to miner's instance links collection.
+ */
 class minerExtractlinksTask extends sfBaseTask
 {
+  /**
+   * Configures task.
+   */
   protected function configure()
   {
     $this->addArguments(array(
-    new sfCommandArgument('dsn', sfCommandArgument::REQUIRED),
+      new sfCommandArgument('dsn', sfCommandArgument::REQUIRED),
     ));
 
+    // TODO add a --verbose switch
     $this->addOptions(array(
-    new sfCommandOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'dev'),
-    new sfCommandOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'doctrine'),
-    new sfCommandOption('progress', null, sfCommandOption::PARAMETER_NONE, 'Display a progress bar'),
-    new sfCommandOption('verbose', null, sfCommandOption::PARAMETER_NONE, 'Display more informations about extraction process'),
+      new sfCommandOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'dev'),
+      new sfCommandOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'doctrine'),
+      new sfCommandOption('extraction-driver', null, sfCommandOption::PARAMETER_REQUIRED, 'Extraction driver class name', 'CI_Extractor_LussumoVanilla1'),
+      new sfCommandOption('progress', null, sfCommandOption::PARAMETER_NONE, 'Displays a progress bar'),
     ));
 
     $this->namespace        = 'miner';
     $this->name             = 'extract-links';
+    // TODO : write descriptions
     $this->briefDescription = '';
     $this->detailedDescription = <<<EOF
-The [miner:extract-links|INFO] extracts links in comments from supplied Lussumo Vanilla database comments.
+The [miner:extract-links|INFO] task does things.
 Call it with:
 
-  [php symfony miner:extract-links "driver://user:pass@host/dbname"|INFO]
+  [php symfony miner:extract-links|INFO]
 EOF;
   }
 
+  /**
+   * Executes task.
+   *
+   * @param array $arguments
+   * @param array $options
+   */
   protected function execute($arguments = array(), $options = array())
   {
-    require_once dirname(__FILE__).'/../vendor/php_arrays/extensions.php';
-    $extensions_mimetype_map = $items;
+    // Setup logging
+    $this->dispatcher->connect('log', array($this, 'onLog'));
 
-    // Create custom doctrine database connection
-    $database = new sfDoctrineDatabase(array('dsn' => $arguments['dsn']));
-    $connection = $database->getDoctrineConnection();
+    // TODO : autoload classes
+    $driver_classname_parts = explode('_', $options['extraction-driver']);
+    require sprintf('%s/vendor/CI/Extractor.php', sfConfig::get('sf_lib_dir'));
+    require sprintf('%s/vendor/CI/Extractor/%s.php', sfConfig::get('sf_lib_dir'), array_pop($driver_classname_parts));
 
-    // Fetch all links from datasource
-    $q = 'select c.CommentID, c.Body, c.DateCreated, c.AuthUserID, c.DiscussionID, d.Name as DiscussionName, u.Name
-    	from LUM_Comment c
-    	inner join LUM_User u on c.AuthUserID = u.UserID
-    	inner join LUM_Discussion d on c.DiscussionID = d.DiscussionID
-        where c.Deleted = "0" and c.WhisperUserID = 0';
-    $comments = $connection->fetchAssoc($q);
+    // Sanity checks
+    if (!class_exists($options['extraction-driver']))
+    {
+      throw new InvalidArgumentException(sprintf('Class "%s" does not exist', $options['extraction-driver']));
+    }
 
-    // Log
-    $this->logSection('info', sprintf('Extracting URLs from %d comments', count($comments)));
+    // Instanciate and configure extraction engine
+    $extractor = new $options['extraction-driver']($this->dispatcher, $this->configuration);
 
-    // Switch connection back to project's one
-    $databaseManager = new sfDatabaseManager($this->configuration);
-    $connection = $databaseManager->getDatabase($options['connection'])->getConnection();
-
-    // For logging purposes
+    // Extraction statistics
     $urls_found_count = 0;
-    $urls_inserted_count = 0;
+    $resources_parsed = 0;
+    $resources_total = $extractor->countResources($arguments['dsn']);
 
-    // Extract links from each comment
-    $comments_parsed = 0;
-
-    // Instanciate progress bar, if user requested so
+    // Instanciate an configure progress bar
     if ($options['progress'])
     {
       include 'Console/ProgressBar.php';
       $progress_bar = new Console_ProgressBar(
-      '** '.$arguments['dsn'].' %fraction% comments [%bar%] %percent%',
-      '=>', '-', 80, count($comments), array('ansi_terminal' => true)
+        '** '.$arguments['dsn'].' %fraction% resources [%bar%] %percent% | ',
+        '=>', '-', 80, $resources_total, array('ansi_terminal' => true)
       );
     }
 
-    foreach ($comments as $comment)
+    // Extract resources from source and insert them in Links database
+    while ($resource_extraction_info = $extractor->extract($arguments['dsn'], $options['connection']))
     {
+      // Update extraction statistics
+      $urls_found_count += $resource_extraction_info['urls_found_count'];
+
+      // Update progress bar
       if ($options['progress'])
       {
-        // Update progress bar
-        $progress_bar->update(++$comments_parsed);
-      }
-
-      // Match URLs in comment body
-      $matches = array();
-      preg_match_all('#\b..?tps?://[-A-Z0-9+&@\#/%?=~_|!:,.;]*[-A-Z0-9+&@\#/%=~_|]#i', $comment['Body'], $matches);
-      $urls_found = $matches[0];
-
-      // If links are found, insert them into database
-      if (count($urls_found))
-      {
-        if ($options['verbose'])
-        {
-          $this->logSection('info', sprintf('Found %d urls in comment %d. Let\'s add them to database.'  , count($urls_found), $comment['CommentID']));
-        }
-        $urls_found_count += count($urls_found);
-        foreach ($urls_found as $url)
-        {
-          $link = new Link();
-          $link->url = $url;
-          $link->comment_id = $comment['CommentID'];
-          // See http://lucene.472066.n3.nabble.com/Unparseable-date-tp484681p484691.html
-          $link->contributed_at = substr($comment['DateCreated'], 0, 10) . "T" . substr($comment['DateCreated'], 11) . "Z";
-          $link->contributor_id = $comment['AuthUserID'];
-          $link->contributor_name = $comment['Name'];
-          $link->discussion_id = $comment['DiscussionID'];
-          $link->discussion_name = $comment['DiscussionName'];
-          try
-          {
-            $link->autoPopulate($extensions_mimetype_map);
-            $link->save();
-            $urls_inserted_count++;
-          }
-          // Invalid URLs, thrown by $link->autoPopulate()
-          catch (InvalidArgumentException $e)
-          {
-            $this->logSection('error', $e->getMessage());
-          }
-          // Duplicate URLs
-          catch (Doctrine_Connection_Mysql_Exception $e)
-          {
-            if ($e->getPortableCode() === Doctrine_Core::ERR_ALREADY_EXISTS)
-            {
-              if ($options['verbose'])
-              {
-                // TODO : skipping insertion is not ideal as we lose meta informations : link existing in several discussion, posted by several users, etc.
-                $this->logSection('info', sprintf('Found duplicate link "%s" in discussion "%d". Skipping insertion', $link->url, $link->discussion_id));
-              }
-            }
-            else
-            {
-              throw $e;
-            }
-          }
-        }
+        $progress_bar->update($resource_extraction_info['resources_parsed_count']);
       }
     }
 
     // Log
-    $this->logSection('info', sprintf('Inserted %d out of %d extracted URLs from %d comments', $urls_inserted_count, $urls_found_count, count($comments)));
+    $this->logSection('extract', sprintf('%d URLs where extracted from %d resources', $urls_found_count, $resources_total));
+  }
+
+  /**
+   * Listens for "log" events and logs messages to stdout.
+   *
+   * @param sfEvent $event
+   */
+  public function onLog(sfEvent $event)
+  {
+    $this->logSection('extract', $event['message']);
   }
 }
