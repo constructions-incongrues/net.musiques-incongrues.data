@@ -12,3 +12,4 @@ config/databases.yml
 web/index.php
 web/sfDoctrinePlugin
 web/sfSolrPlugin
+data/sql/schema.sql
