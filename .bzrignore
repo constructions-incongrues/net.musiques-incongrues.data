@@ -2,7 +2,6 @@ log/*
 cache/*
 .buildpath
 data/solr_index
-data/sql
 config/solr/*
 lib/model/doctrine/base/*
 lib/filter/doctrine/base/*
