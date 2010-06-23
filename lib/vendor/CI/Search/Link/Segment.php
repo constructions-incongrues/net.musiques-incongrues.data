@@ -59,6 +59,12 @@ class CI_Search_Link_Segment
     }
     $c->setLimit($limit);
 
+    // default : return links with availability being marked as "available" or "unknown"
+    if ($parameters->get('availability', null) === null)
+    {
+        $c->addField('-availability', 'unavailable');
+    }
+
     // Define sorting
     $sorting_direction = $parameters->get('sort_direction', 'asc');
     if ($sorting_direction == 'desc')
@@ -108,5 +114,4 @@ class CI_Search_Link_Segment
 
     return array_keys($schema_fields);
   }
-
 }

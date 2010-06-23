@@ -258,6 +258,7 @@
   <field name='comment_id' type='int' stored='true' multiValued='false' required='false'  />
   <field name='discussion_id' type='int' stored='true' multiValued='false' required='false'  />
   <field name='discussion_name' type='text' stored='true' multiValued='false' required='false'  />
+  <field name='availability' type='text' stored='true' multiValued='false' required='false'  />
  </fields>
 
  <!-- field to use to determine and enforce document uniqueness. -->
@@ -283,5 +284,6 @@
   <copyField source='comment_id' dest='sfl_all' />
   <copyField source='discussion_id' dest='sfl_all' />
   <copyField source='discussion_name' dest='sfl_all' />
+  <copyField source='availability' dest='sfl_all' />
   
 </schema>

@@ -43,7 +43,7 @@ EOF;
     }
     if (!$options['with-unavailable'])
     {
-      $q->andWhere('l.is_available != 0 or l.is_available is null');
+      $q->andWhere('l.availability != "unavailable"');
     }
 
     // Fetch links from database
@@ -94,7 +94,7 @@ EOF;
           $link->mime_type = $this->getMimeType($header);
 
           // Mark link as available
-          $link->is_available = true;
+          $link->availability = 'available';
 
           // Save link to database
           $link->replace();
@@ -116,7 +116,7 @@ EOF;
               )
             );
           }
-          $link->is_available = false;
+          $link->availability = 'unavailable';
           $link->replace();
         }
       }
@@ -130,7 +130,7 @@ EOF;
         {
           $this->logSection('error', sprintf('[ERR] Received exception with message "%s" for link "%s" - Marking as unavailable.', $e->getMessage(), $link->url));
         }
-        $link->is_available = false;
+        $link->availability = 'unavailable';
         $link->replace();
       }
 

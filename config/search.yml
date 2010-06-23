@@ -26,7 +26,9 @@ IndexA:
           type:      int
         discussion_name:
           stored:    true
-          
+        availability:
+          stored:    true
+
   index:
     encoding: UTF-8
     cultures: [fr]
