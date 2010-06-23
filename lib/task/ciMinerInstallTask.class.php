@@ -22,7 +22,7 @@ class ciInstallTask extends sfBaseTask
 
     $this->namespace        = 'miner';
     $this->name             = 'install';
-    $this->briefDescription = 'Installs Vanilla Miner project.';
+    $this->briefDescription = 'Installs Vanilla Miner project';
     $this->detailedDescription = <<<EOF
 
 [Handle with care, this task will WIPE your data|ERROR] !

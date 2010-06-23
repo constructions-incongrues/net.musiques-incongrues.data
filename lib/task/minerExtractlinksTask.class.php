@@ -25,13 +25,11 @@ class minerExtractlinksTask extends sfBaseTask
 
     $this->namespace        = 'miner';
     $this->name             = 'extract-links';
-    // TODO : write descriptions
-    $this->briefDescription = '';
+    $this->briefDescription = 'Extracts links from datasource';
     $this->detailedDescription = <<<EOF
-The [miner:extract-links|INFO] task does things.
 Call it with:
 
-  [php symfony miner:extract-links|INFO]
+  [php symfony miner:extract-links --extraction-driver=My_Extraction_Driver|INFO]
 EOF;
   }
 
