@@ -2,7 +2,6 @@ log/*
 cache/*
 .buildpath
 data/solr_index
-data/sql
 config/solr/*
 lib/model/doctrine/base/*
 lib/filter/doctrine/base/*
@@ -12,3 +11,4 @@ config/databases.yml
 web/index.php
 web/sfDoctrinePlugin
 web/sfSolrPlugin
+data/sql/schema.sql
