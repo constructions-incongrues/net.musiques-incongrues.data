@@ -49,3 +49,23 @@ Link:
       fields: 
         availability:
           length: 11
+
+ExtractionLog:
+  actAs:
+    Timestampable:
+  columns:
+    id: 
+      type: integer
+      autoincrement: true
+      primary: true
+      notnull: true
+    extraction_driver:
+      type: string
+    started_on:
+      type: timestamp
+    finished_on:
+      type: timestamp
+    resources_parsed:
+      type: int
+    urls_extracted:
+      type: int

@@ -20,6 +20,7 @@ class minerExtractlinksTask extends sfBaseTask
       new sfCommandOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'dev'),
       new sfCommandOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'doctrine'),
       new sfCommandOption('extraction-driver', null, sfCommandOption::PARAMETER_REQUIRED, 'Extraction driver class name', 'CI_Extractor_LussumoVanilla1'),
+      new sfCommandOption('incremental', null, sfCommandOption::PARAMETER_REQUIRED, 'If true, only extracts URLs from new and updated resources since last extraction', true),
       new sfCommandOption('progress', null, sfCommandOption::PARAMETER_NONE, 'Displays a progress bar'),
     ));
 
@@ -55,8 +56,38 @@ EOF;
       throw new InvalidArgumentException(sprintf('Class "%s" does not exist', $options['extraction-driver']));
     }
 
+    if ($options['incremental'] === 'false')
+    {
+      $options['incremental'] = false;
+    }
+
+    // Instanciate database connection
+    $databaseManager = new sfDatabaseManager($this->configuration);
+    $connection = $databaseManager->getDatabase($options['connection'])->getConnection();
+
+    // If extraction is incremental, retrieve last extraction date
+    $since = null;
+    if ($options['incremental'])
+    {
+      $since = $this->getLastExtractionDate($connection);
+      if ($since)
+      {
+        $this->logSection('extract', sprintf('Incrementally extracting URLs from resources created or updated since "%s"', $since));
+      }
+      else
+      {
+        $this->logSection('extract', 'Found no entries in extraction log. Extracting URLs from all resources.');
+      }
+    }
+
+    // Create new extraction log entry
+    $log_entry = new ExtractionLog();
+    $log_entry->extraction_driver = $options['extraction-driver'];
+    $log_entry->started_on = date('Y-m-d H:i:s');
+    $log_entry->save();
+
     // Instanciate and configure extraction engine
-    $extractor = new $options['extraction-driver']($this->dispatcher, $this->configuration);
+    $extractor = new $options['extraction-driver']($this->dispatcher, $this->configuration, $since);
 
     // Extraction statistics
     $urls_found_count = 0;
@@ -76,10 +107,15 @@ EOF;
       }
 
       // Extract resources from source and insert them in Links database
-      while ($resource_extraction_info = $extractor->extract($arguments['dsn'], $options['connection']))
+      while ($resource_extraction_info = $extractor->extract($arguments['dsn'], $options['connection'], $since))
       {
         // Update extraction statistics
         $urls_found_count += $resource_extraction_info['urls_found_count'];
+
+        // Update extraction log
+        $log_entry->resources_parsed = $resource_extraction_info['resources_parsed_count'];
+        $log_entry->urls_extracted = $urls_found_count;
+        $log_entry->save();
 
         // Update progress bar
         if ($options['progress'])
@@ -95,6 +131,33 @@ EOF;
     {
       $this->logSection('extract', 'No resources to extract. Exiting.');
     }
+
+    // Record finish time
+    $log_entry->finished_on = date('Y-m-d H:i:s');
+    $log_entry->save();
+  }
+
+  /**
+   * Returns date of most recent extraction.
+   *
+   * @param string $doctrine_connection
+   */
+  private function getLastExtractionDate()
+  {
+    // Retrieve last extraction date
+    $last_extraction_date = Doctrine_Query::create()
+      ->select('l.started_on')
+      ->from('ExtractionLog l')
+      ->orderBy('l.started_on desc')
+      ->limit(1)
+      ->execute(null, Doctrine_Core::HYDRATE_SINGLE_SCALAR);
+
+    if (!$last_extraction_date)
+    {
+      $last_extraction_date = null;
+    }
+
+    return $last_extraction_date;
   }
 
   /**

@@ -13,7 +13,7 @@ abstract class CI_Extractor
    *
    * @return array
    */
-  abstract protected function getResources($dsn_source);
+  abstract protected function getResources($dsn_source, $sources = null);
 
   /**
    * Returns text from which URLs will be extracted.
@@ -39,7 +39,7 @@ abstract class CI_Extractor
    *
    * @return int
    */
-  abstract protected function countResources($dsn_source);
+  abstract protected function countResources($dsn_source, $since = null);
 
   /**
    * @var array
@@ -69,7 +69,7 @@ abstract class CI_Extractor
   /**
    * Instanciates and configures extractor.
    *
-   * @param sfEventDispatcher $event_dispatcher
+   * @param sfEventDispatcher      $event_dispatcher
    * @param sfProjectConfiguration $configuration
    */
   public function __construct(sfEventDispatcher $event_dispatcher, sfProjectConfiguration $configuration)
@@ -115,15 +115,16 @@ abstract class CI_Extractor
   /**
    * Extracts links from source database and inserts them into links collection.
    *
-   * @param string               $dsn_source
-   * @param sfDoctrineConnection $connection_dest
+   * @param string $dsn_source
+   * @param string $connection_dest
+   * @param string $since           Extract urls from resources updated or create since this date (Y-m-d H:i:s)
    */
-  public function extract($dsn_source, $connection_dest)
+  public function extract($dsn_source, $connection_dest, $since = null)
   {
     if (!$this->resources)
     {
       // Retrieve comments from database
-      $resources = $this->getResources($dsn_source);
+      $resources = $this->getResources($dsn_source, $since);
       $this->log(sprintf('Extracting URLs from %d resources using extractor "%s"', count($resources), get_class($this)));
       $this->resources = $resources;
     }
