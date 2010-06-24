@@ -15,13 +15,18 @@ class CI_Extractor_LussumoVanilla1 extends CI_Extractor
    *
    * NEXT : make table prefix configurable
    */
-  protected function getResources($dsn_source)
+  protected function getResources($dsn_source, $since = null)
   {
     $q = 'select c.CommentID, c.Body, c.DateCreated, c.AuthUserID, c.DiscussionID, d.Name as DiscussionName, u.Name
     	from LUM_Comment c
     	inner join LUM_User u on c.AuthUserID = u.UserID
     	inner join LUM_Discussion d on c.DiscussionID = d.DiscussionID
     	where c.Deleted != 1 and c.WhisperUserID = 0';
+    if ($since)
+    {
+      $q .= sprintf(' and c.DateCreated > "%s"', $since);
+    }
+
 
     return $this->getConnection($dsn_source)->fetchAssoc($q);
   }
@@ -74,9 +79,13 @@ class CI_Extractor_LussumoVanilla1 extends CI_Extractor
    *
    * @return int
    */
-  public function countResources($dsn)
+  public function countResources($dsn, $since = null)
   {
     $q = 'select count(c.CommentID) from LUM_Comment c where c.Deleted != 1 and c.WhisperUserID = 0';
+    if ($since)
+    {
+      $q .= sprintf(' where c.DateCreated > "%s"', $since);
+    }
 
     return (int)$this->getConnection($dsn)->fetchOne($q);
   }
