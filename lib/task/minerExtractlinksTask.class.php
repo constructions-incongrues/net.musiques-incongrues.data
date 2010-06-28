@@ -7,6 +7,13 @@
 class minerExtractlinksTask extends sfBaseTask
 {
     /**
+     * Ongoing extraction's log entry.
+     *
+     * @var ExtractionLog
+     */
+    private $log_entry;
+
+    /**
      * Configures task.
      */
     protected function configure()
@@ -45,6 +52,11 @@ EOF;
         // Setup logging
         $this->dispatcher->connect('log', array($this, 'onLog'));
 
+        // Setup signal handling
+        declare(ticks = 1);
+        pcntl_signal(SIGTERM, array($this, 'handleSignal'));
+        pcntl_signal(SIGINT, array($this, 'handleSignal'));
+
         // TODO : autoload classes
         $driver_classname_parts = explode('_', $options['extraction-driver']);
         require sprintf('%s/vendor/CI/Extractor.php', sfConfig::get('sf_lib_dir'));
@@ -80,11 +92,16 @@ EOF;
             }
         }
 
-        // Create new extraction log entry
-        $log_entry = new ExtractionLog();
-        $log_entry->extraction_driver = $options['extraction-driver'];
-        $log_entry->started_on = date('Y-m-d H:i:s');
-        $log_entry->save();
+        /*
+         * Create new extraction log entry.
+         *
+         * This log entry is stored in an object's field  in order to make it available
+         * to the handleSignal() method.
+         */
+        $this->log_entry = new ExtractionLog();
+        $this->log_entry->extraction_driver = $options['extraction-driver'];
+        $this->log_entry->started_on = date('Y-m-d H:i:s');
+        $this->log_entry->save();
 
         // Instanciate and configure extraction engine
         $extractor = new $options['extraction-driver']($this->dispatcher, $this->configuration, $since);
@@ -113,9 +130,9 @@ EOF;
                 $urls_found_count += $resource_extraction_info['urls_found_count'];
 
                 // Update extraction log
-                $log_entry->resources_parsed = $resource_extraction_info['resources_parsed_count'];
-                $log_entry->urls_extracted = $urls_found_count;
-                $log_entry->save();
+                $this->log_entry->resources_parsed = $resource_extraction_info['resources_parsed_count'];
+                $this->log_entry->urls_extracted = $urls_found_count;
+                $this->log_entry->save();
 
                 // Update progress bar
                 if ($options['progress'])
@@ -133,8 +150,23 @@ EOF;
         }
 
         // Record finish time
-        $log_entry->finished_on = date('Y-m-d H:i:s');
-        $log_entry->save();
+        $this->log_entry->finished_on = date('Y-m-d H:i:s');
+        $this->log_entry->save();
+    }
+
+    /**
+     * Catches interruption signals.
+     * If script is interrupted, ongoing extraction's log entry is deleted.
+     *
+     * @param $signal
+     */
+    public function handleSignal($signal)
+    {
+        // Delete current log entry
+        $this->log_entry->delete();
+
+        // Exit script
+        exit;
     }
 
     /**
