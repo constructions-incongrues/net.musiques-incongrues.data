@@ -91,8 +91,7 @@ EOF;
 
         // Extraction statistics
         $urls_found_count = 0;
-        $resources_parsed = 0;
-        $resources_total = $extractor->countResources($arguments['dsn']);
+        $resources_total = $extractor->countResources($arguments['dsn'], $since);
 
         if ($resources_total > 0)
         {
@@ -125,14 +124,16 @@ EOF;
             }
 
             // Log
-            $this->logSection('extract', sprintf('%d URLs where extracted from %d resources', $urls_found_count, $resources_total));
+            $this->logSection('extract', sprintf('%d URLs were extracted from %d resources', $urls_found_count, $resources_total));
         }
         else
         {
             $this->logSection('extract', 'No resources to extract. Exiting.');
         }
 
-        // Record finish time
+        // Record finish time and statistics
+        $databaseManager = new sfDatabaseManager($this->configuration);
+        $connection = $databaseManager->getDatabase($options['connection'])->getConnection();
         $log_entry->finished_on = date('Y-m-d H:i:s');
         $log_entry->save();
     }

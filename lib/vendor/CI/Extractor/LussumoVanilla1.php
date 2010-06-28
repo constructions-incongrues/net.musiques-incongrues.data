@@ -84,7 +84,7 @@ class CI_Extractor_LussumoVanilla1 extends CI_Extractor
     $q = 'select count(c.CommentID) from LUM_Comment c where c.Deleted != 1 and c.WhisperUserID = 0';
     if ($since)
     {
-      $q .= sprintf(' where c.DateCreated > "%s"', $since);
+      $q .= sprintf(' and c.DateCreated > "%s"', $since);
     }
 
     return (int)$this->getConnection($dsn)->fetchOne($q);
