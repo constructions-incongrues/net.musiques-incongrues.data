@@ -1,7 +1,15 @@
 <?php
-
+/**
+ * Crawls links URLs in order to gather meaningful informations (availability, etc).
+ */
 class minerExpandLinksTask extends sfBaseTask
 {
+    /**
+     * Configures task.
+     *
+     * (non-PHPdoc)
+     * @see vendor/symfony/lib/task/sfTask::configure()
+     */
     protected function configure()
     {
         $this->addOptions(array(
@@ -16,7 +24,6 @@ class minerExpandLinksTask extends sfBaseTask
 
         $this->namespace        = 'miner';
         $this->name             = 'expand-links';
-        // TODO : write descriptions
         $this->briefDescription = 'Expands informations about links by crawling their URLs';
         $this->detailedDescription = <<<EOF
 
@@ -27,6 +34,12 @@ Use cases :
 EOF;
     }
 
+    /**
+     * Executes task.
+     *
+     * (non-PHPdoc)
+     * @see vendor/symfony/lib/task/sfTask::execute()
+     */
     protected function execute($arguments = array(), $options = array())
     {
         // Open database connection
@@ -151,6 +164,13 @@ EOF;
         }
     }
 
+    /**
+     * Lowercases all header names.
+     *
+     * @param array $header
+     *
+     * @return array
+     */
     private function normalizeHeader(array $header)
     {
         // Make all header names lower case
@@ -161,6 +181,13 @@ EOF;
         return $header;
     }
 
+    /**
+     * Extracts mime type from supplied header content-type string.
+     *
+     * @param array $header
+     *
+     * @return string
+     */
     private function getMimeType(array $header)
     {
         $mime_type = null;
