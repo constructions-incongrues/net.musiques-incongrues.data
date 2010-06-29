@@ -117,7 +117,7 @@ abstract class CI_Extractor
    *
    * @param string $dsn_source
    * @param string $connection_dest
-   * @param string $since           Extract urls from resources updated or create since this date (Y-m-d H:i:s)
+   * @param string $since           Extract urls from resources updated or created since this date (Y-m-d H:i:s)
    */
   public function extract($dsn_source, $connection_dest, $since = null)
   {

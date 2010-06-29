@@ -67,5 +67,7 @@ ExtractionLog:
       type: timestamp
     resources_parsed:
       type: int
+      default: 0
     urls_extracted:
       type: int
+      default: 0
