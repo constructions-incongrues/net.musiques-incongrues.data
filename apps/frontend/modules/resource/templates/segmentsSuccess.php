@@ -36,7 +36,7 @@ use_stylesheet('http://shjs.sourceforge.net/css/sh_acid.min.css');
     <h4 id="segments-<?php echo $segment?>"><?php echo $segment ?></h4>
     <?php include_partial(sprintf('resource/documentation/%s/segment/%s', $sf_request->getParameter('collection'), $segment)); ?>
     <p>URL de requête :</p>
-    <pre>GET <?php echo url_for(sprintf('@resources_collection_segment_get?collection=%s&segment=%s', $sf_request->getParameter('collection'), $segment), true) ?></pre>
+    <pre>GET <a href="<?php echo url_for(sprintf('@resources_collection_segment_get?collection=%s&segment=%s', $sf_request->getParameter('collection'), $segment), true) ?>" ><?php echo url_for(sprintf('@resources_collection_segment_get?collection=%s&segment=%s', $sf_request->getParameter('collection'), $segment), true) ?></a></pre>
   <?php endforeach; ?>
 </div>
 </div>

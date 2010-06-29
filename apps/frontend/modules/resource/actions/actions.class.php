@@ -8,99 +8,114 @@
  */
 class resourceActions extends sfActions
 {
-  public function executeCollections(sfWebRequest $request)
-  {
-    $collections = array();
-    $collections_names = sfConfig::get('app_resources_collections', array());
-    foreach ($collections_names as $collection_name)
+    public function executeCollections(sfWebRequest $request)
     {
-      $collections[$collection_name] = array('count' => Doctrine::getTable(ucfirst($collection_name))->count());
-    }
-    $this->collections = $collections;
-  }
-  
-  public function executeSegments(sfWebRequest $request)
-  {
-    $segments = array();
-    if ($resource_parameters = sfConfig::get(sprintf('app_resources_%s', $request->getParameter('collection')), false))
-    {
-      $segments = $resource_parameters['segments'];
+        $collections = array();
+        $collections_names = sfConfig::get('app_miner_collections', array());
+
+        foreach ($collections_names as $collection_name => $collection_info)
+        {
+            include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/%s/Segment.php', $collection_info['model']);
+
+            // Alphabetical sort of segments
+            sort($collection_info['segments']);
+
+            // Gather informations about each collection segment
+            $segments_infos = array();
+            foreach ($collection_info['segments'] as $segment_name)
+            {
+                include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/%s/Segment/%s.php', $collection_info['model'], ucfirst($segment_name));
+                $search_classname = sprintf('CI_Search_%s_Segment_%s', $collection_info['model'], $segment_name);
+                // TODO : Lucene instance must be configurable
+                $search = new $search_classname($this->dispatcher, sfLucene::getInstance('IndexA', 'fr'));
+                $segments_infos[$segment_name] = array('count' => $search->count($request->getParameterHolder()));
+            }
+
+            $collections[$collection_name] = array(
+                'count'    => Doctrine::getTable($collection_info['model'])->count(),
+                'segments' => $segments_infos
+            );
+        }
+        $this->collections = $collections;
     }
 
-    $this->segments = $segments;
-  }
-  
-  public function executeFormats(sfWebRequest $request)
-  {
-    $segment_formats = array();
-    if ($resource_parameters = sfConfig::get(sprintf('app_resources_%s', $request->getParameter('collection')), false))
+    public function executeSegments(sfWebRequest $request)
     {
-      $segment_formats = $resource_parameters[$request->getParameter('segment')]['formats'];
+        $collections = sfConfig::get('app_miner_collections');
+        $segments = array();
+        if (isset($collections[$request->getParameter('collection')]));
+        {
+            $segments = $collections[$request->getParameter('collection')]['segments'];
+        }
+        $this->segments = $segments;
     }
 
-    $this->formats = $segment_formats;
-  }
-  
-  public function executeGet(sfWebRequest $request)
-  {
-    // TODO : a good place to learn about dependency injection ?
-    // TODO : "q" query parameter makes it possible to directly query solr (no sfLuceneCriteria)
-    
-    // Gather meaningful parameters
-    $resource_collection = $request->getParameter('collection', 'unknown');
-    $resource_segment = $request->getParameter('segment', 'all');
-    $format = $request->getParameter('format', 'html');
-    
-    // TODO : autoload those clases
-    include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/%s/Segment.php', ucfirst($resource_collection));
-    include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/%s/Segment/%s.php', ucfirst($resource_collection), ucfirst($resource_segment));
-    include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/Formatter/%s.php', ucfirst($format));
-    
-    // Get results from selected resource segment
-    $resource_segment_class  = sprintf('CI_Search_%s_Segment_%s', ucfirst($resource_collection), ucfirst($resource_segment));
-    if (!class_exists($resource_segment_class))
+    public function executeFormats(sfWebRequest $request)
     {
-      throw new InvalidArgumentException(sprintf('Search class "%s" does not exist for "%s/%s" resource segment', $resource_segment_class, $resource_collection, $resource_segment));
+        $segment_formats = array();
+        if ($resource_parameters = sfConfig::get(sprintf('app_resources_%s', $request->getParameter('collection')), false))
+        {
+            $segment_formats = $resource_parameters[$request->getParameter('segment')]['formats'];
+        }
+
+        $this->formats = $segment_formats;
     }
-    // TODO : lucene index must be configurable
-    $resource_segment_instance = new $resource_segment_class($this->getContext()->getEventDispatcher(), sfLucene::getInstance('IndexA', 'fr'));
-    $raw_results = $resource_segment_instance->search($request->getParameterHolder());
-    
-    // Make sure results are unique (this a just a hack)
-    // see http://www.php.net/manual/en/function.array-unique.php#91134
-    // NOTE : it sucks as it makes the "limit" parameter not trustable
-    // TODO : resource unicity must be enforced when importing documents into solr
-    if ($this->getRequestParameter('hack_unique_results', false))
+
+    public function executeGet(sfWebRequest $request)
     {
-      $raw_results_unique = array();
-      foreach ($raw_results as $result)
-      {
-        $raw_results_unique[md5($result['url'])] = $result;
-      }
-      $raw_results = $raw_results_unique;
+        // TODO : a good place to learn about dependency injection ?
+        // TODO : "q" query parameter makes it possible to directly query solr (no sfLuceneCriteria)
+
+        // Gather meaningful parameters
+        $resource_collection = $request->getParameter('collection', 'unknown');
+        $resource_segment = $request->getParameter('segment', 'all');
+        $format = $request->getParameter('format', 'html');
+
+        // Get model corresponding to collection
+        $collections_infos = sfConfig::get('app_miner_collections');
+        if (!isset($collections_infos[$resource_collection]))
+        {
+            throw new InvalidArgumentException(sprintf('Unknown collection "%s"', $resource_collection));
+        }
+        $collection = $collections_infos[$resource_collection];
+        $resource_model = $collection['model'];
+
+        // TODO : autoload those classes
+        include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/%s/Segment.php', ucfirst($resource_model));
+        include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/%s/Segment/%s.php', ucfirst($resource_model), ucfirst($resource_segment));
+        include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/Formatter/%s.php', ucfirst($format));
+
+        // Get results from selected resource segment
+        $resource_segment_class  = sprintf('CI_Search_%s_Segment_%s', ucfirst($resource_model), ucfirst($resource_segment));
+        if (!class_exists($resource_segment_class))
+        {
+            throw new InvalidArgumentException(sprintf('Search class "%s" does not exist for "%s/%s" resource segment', $resource_segment_class, $resource_model, $resource_segment));
+        }
+        // TODO : lucene index must be configurable
+        $resource_segment_instance = new $resource_segment_class($this->getContext()->getEventDispatcher(), sfLucene::getInstance('IndexA', 'fr'));
+        $raw_results = $resource_segment_instance->search($request->getParameterHolder());
+
+        // Format results
+        $formatter_class = sprintf('CI_Search_Formatter_%s', ucfirst($format));
+        if (!class_exists($formatter_class))
+        {
+            throw new InvalidArgumentException(sprintf('Formatter class "%s" does not exist for format "%s"', $formatter_class, $format));
+        }
+        $formatter = new $formatter_class($this->getContext()->getEventDispatcher());
+        $results = $formatter->format($raw_results);
+
+        // Tweak response depending on formatter
+        $this->getResponse()->setContentType($formatter->content_type);
+        $this->setLayout($formatter->sf_has_layout);
+        if (!$formatter->sf_has_layout)
+        {
+            sfConfig::set('sf_web_debug', false);
+        }
+
+        // Pass results to view
+        $this->results = $results;
+
+        // Select template
+        return ucfirst($format);
     }
-    
-    // Format results
-    $formatter_class = sprintf('CI_Search_Formatter_%s', ucfirst($format));
-    if (!class_exists($formatter_class))
-    {
-      throw new InvalidArgumentException(sprintf('Formatter class "%s" does not exist for format "%s"', $formatter_class, $format));
-    }
-    $formatter = new $formatter_class($this->getContext()->getEventDispatcher());
-    $results = $formatter->format($raw_results);
-    
-    // Tweak response depending on formatter
-    $this->getResponse()->setContentType($formatter->content_type);
-    $this->setLayout($formatter->sf_has_layout);
-    if (!$formatter->sf_has_layout)
-    {
-      sfConfig::set('sf_web_debug', false);
-    }
-    
-    // Pass results to view
-    $this->results = $results;
-    
-    // Select template
-    return ucfirst($format);
-  }  
 }
