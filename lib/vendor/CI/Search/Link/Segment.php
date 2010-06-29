@@ -35,6 +35,18 @@ class CI_Search_Link_Segment
     return $results_array;
   }
 
+  public function count(sfParameterHolder $parameters)
+  {
+    // Build search criteria from request parameters
+    $c = $this->buildLuceneCriteria($parameters);
+    $c->setLimit(0);
+
+    // Retrieve results from Solr
+    $results_lucene = $this->lucene->friendlyFind($c);
+
+    return $results_lucene->count();
+  }
+
   protected function buildLuceneCriteria(sfParameterHolder $parameters)
   {
     $c = new sfLuceneCriteria();
@@ -102,6 +114,9 @@ class CI_Search_Link_Segment
       }
       $results_array[] = $result_array;
     }
+
+    // Total number of results found
+    $results_array['num_found'] = $results_lucene->count();
 
     return $results_array;
   }

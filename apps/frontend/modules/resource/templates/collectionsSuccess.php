@@ -23,9 +23,14 @@
   <h2>Collections de ressources</h2>
   <?php foreach ($collections as $collection_name => $collection_data): ?>
     <h3><?php echo $collection_name ?></h3>
-    <?php // TODO : data are not accessible in partial. WTF ? ?>
     <?php include_partial(sprintf('resource/documentation/%s/description', $collection_name), array('collection_name' => $collection_name, 'collection_data' => $collection_data)) ?>
-    <p>À ce jour, cette collection regroupe <strong><?php echo $collection_data['count'] ?></strong> ressources.</p>
+    <p>À ce jour, cette collection regroupe <strong><?php echo $collection_data['segments']['all']['count'] ?></strong> ressources.</p>
     <p><?php echo link_to('Consulter la documentation', '@resources_collection?collection='.$collection_name) ?></p>
+    <p>Segments disponibles :</p>
+    <ul>
+    <?php foreach ($collection_data['segments'] as $segment_name => $segment_infos): ?>
+        <li><a href="<?php echo url_for(sprintf('@resources_collection?collection=%s#segments-%s', $collection_name, $segment_name)) ?>" title="Consulter la documentation du segment <?php echo $segment_name ?>"><?php echo $segment_name ?></a> : <strong><?php echo $segment_infos['count']?></strong> ressources</li>
+    <?php endforeach; ?>
+    </ul>
   <?php endforeach; ?>
 </div>

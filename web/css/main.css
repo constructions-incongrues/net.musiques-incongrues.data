@@ -1,7 +1,7 @@
 body { margin: 0; text-align: center; font-size: large; font-family: "Crimson Text"; }
 h1, h2 { font-family: "Lobster"; }
 h1 { text-align: center }
-pre { padding: 1em; }
+pre { padding: 1em; background-color: #eee; }
 dl { margin-left: 1em; }
 dt { font-weight: bold; }
 a { color: #666; }

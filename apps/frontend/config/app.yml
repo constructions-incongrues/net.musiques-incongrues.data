@@ -3,16 +3,8 @@
 
 # default values
 all:
-  resources:
-    collections: [link]
-    link:
-      segments:  [all, images, mp3, youtube]
-      all:
-        formats: [html, json]
-      mp3:
-        formats: [html, json, xspf]
-      youtube:
-        formats: [html, json, xspf]
-      images:
-        formats: [html, json]
-        
+  miner:
+    collections:
+      links:
+        model: Link
+        segments: [all, mp3, images, youtube]
