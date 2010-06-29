@@ -98,10 +98,10 @@ EOF;
          * This log entry is stored in an object's field  in order to make it available
          * to the handleSignal() method.
          */
-        $log_entry = new ExtractionLog();
-        $log_entry->extraction_driver = $options['extraction-driver'];
-        $log_entry->started_on = date('Y-m-d H:i:s');
-        $log_entry->save();
+        $this->log_entry = new ExtractionLog();
+        $this->log_entry->extraction_driver = $options['extraction-driver'];
+        $this->log_entry->started_on = date('Y-m-d H:i:s');
+        $this->log_entry->save();
 
         // Instanciate and configure extraction engine
         $extractor = new $options['extraction-driver']($this->dispatcher, $this->configuration, $since);
@@ -151,8 +151,8 @@ EOF;
         // Record finish time and statistics
         $databaseManager = new sfDatabaseManager($this->configuration);
         $connection = $databaseManager->getDatabase($options['connection'])->getConnection();
-        $log_entry->finished_on = date('Y-m-d H:i:s');
-        $log_entry->save();
+        $this->log_entry->finished_on = date('Y-m-d H:i:s');
+        $this->log_entry->save();
     }
 
     /**
