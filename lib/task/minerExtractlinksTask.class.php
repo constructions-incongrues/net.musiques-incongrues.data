@@ -29,6 +29,7 @@ class minerExtractlinksTask extends sfBaseTask
         new sfCommandOption('extraction-driver', null, sfCommandOption::PARAMETER_REQUIRED, 'Extraction driver class name', 'CI_Extractor_LussumoVanilla1'),
         new sfCommandOption('incremental', null, sfCommandOption::PARAMETER_REQUIRED, 'If true, only extracts URLs from new and updated resources since last extraction', true),
         new sfCommandOption('progress', null, sfCommandOption::PARAMETER_NONE, 'Displays a progress bar'),
+        new sfCommandOption('and-expand', null, sfCommandOption::PARAMETER_NONE, 'Launches expansion on newly extracted links'),
         ));
 
         $this->namespace        = 'miner';
@@ -146,6 +147,12 @@ EOF;
         else
         {
             $this->logSection('extract', 'No resources to extract. Exiting.');
+        }
+
+        // Run links expansion if user asked so
+        if ($options['and-expand'])
+        {
+            $this->runTask('miner:expand-links', array(), array('progress' => $options['progress']));
         }
 
         // Record finish time and statistics
