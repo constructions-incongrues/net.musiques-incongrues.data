@@ -13,7 +13,7 @@ $(document)
           $('#ananas')
               .click(
                   function() {
-                    var uri = '/collections/link/segments/images/get?limit=1&sort_field=random&format=json';
+                    var uri = '/collections/links/segments/images/get?limit=1&sort_field=random&format=json';
                     $
                         .get(
                             uri,

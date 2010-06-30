@@ -6,7 +6,7 @@
     </p>
 
     <p>
-    Le site met à votre disposition des <strong>collections</strong> de <strong>ressources</strong> qui peuvent être requêtées selon différent critères.<br />
+    Le site met à votre disposition des <strong>collections</strong> de <strong>ressources</strong> qui peuvent être requêtées selon différents critères.<br />
     La réponse à chaque requête pourra être obtenue sous différents <strong>formats</strong>, en fonction du besoin.<br />
     Pour faciliter le travail d'exploitation, le service propose des <strong>segments de ressources</strong> prédéfinis,
     dépendants des collections de ressources.
