@@ -103,16 +103,37 @@ EOF;
                             $this->logSection('expand', sprintf('[%d] %s - Updating metadata, marking as available', $response->getStatus(), $link->url));
                         }
 
-                        // Extract meaningful informations from server response
-                        $header = $response->getHeader();
-                        $header = $this->normalizeHeader($header);
-                        $link->mime_type = $this->getMimeType($header);
+                        // Update link data according to response
+                        $link = $this->updateLink($link, $response);
+                    }
+                    // Try GET when server answers "405 Method Not Allowed"
+                    elseif (405 == $response->getStatus())
+                    {
+                        if ($options['progress'])
+                        {
+                            $this->log(sprintf('[%d] %s', $response->getStatus(), $link->url));
+                        }
+                        else
+                        {
+                            $this->logSection('expand', sprintf('[%d] %s - Received "Method Not Allowed" error code. Trying GET.', $response->getStatus(), $link->url));
+                        }
 
-                        // Mark link as available
-                        $link->availability = 'available';
+                        $request->setMethod(HTTP_Request2::METHOD_GET);
+                        $response = $request->send();
+                        if (200 == $response->getStatus())
+                        {
+                            if ($options['progress'])
+                            {
+                                $this->log(sprintf('[%d] %s', $response->getStatus(), $link->url));
+                            }
+                            else
+                            {
+                                $this->logSection('expand', sprintf('[%d] %s - Updating metadata, marking as available', $response->getStatus(), $link->url));
+                            }
 
-                        // Save link to database
-                        $link->replace();
+                            // Update link data according to response
+                            $link = $this->updateLink($link, $response);
+                        }
                     }
                     else
                     {
@@ -134,7 +155,6 @@ EOF;
                             );
                         }
                         $link->availability = 'unavailable';
-                        $link->replace();
                     }
                 }
                 catch (HTTP_Request2_Exception $e)
@@ -148,8 +168,10 @@ EOF;
                         $this->logSection('expand', sprintf('[ERR] Received exception with message "%s" for link "%s" - Marking as unavailable.', $e->getMessage(), $link->url), null, 'ERROR');
                     }
                     $link->availability = 'unavailable';
-                    $link->replace();
                 }
+
+                // Save link to database
+                $link->replace();
 
                 // Update progress bar
                 if ($options['progress'])
@@ -209,5 +231,26 @@ EOF;
         }
 
         return $mime_type;
+    }
+
+    /**
+     * Updates link according to supplied (successful) response
+     *
+     * @param Link                   $link
+     * @param HTTP_Request2_Response $response
+     *
+     * @return Link $link
+     */
+    private function updateLink(Link $link, HTTP_Request2_Response $response)
+    {
+        // Extract meaningful informations from server response
+        $header = $response->getHeader();
+        $header = $this->normalizeHeader($header);
+        $link->mime_type = $this->getMimeType($header);
+
+        // Mark link as available
+        $link->availability = 'available';
+
+        return $link;
     }
 }
