@@ -1,0 +1,9 @@
+cache/*
+log/*
+data/solr_index/*
+web/index.php
+web/sf
+.buildpath
+.settings/
+config/databases.yml
+data/sql/schema.sql
