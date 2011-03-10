@@ -1,5 +1,6 @@
 body { margin: 0; text-align: center; font-size: large; font-family: "Crimson Text"; }
 div.html { text-align: left; }
+.in_search { background-color: yellow; }
 h1, h2 { font-family: "Lobster"; }
 h1 { text-align: center }
 pre { padding: 1em; background-color: #eee; }
