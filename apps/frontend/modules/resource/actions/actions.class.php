@@ -118,10 +118,17 @@ class resourceActions extends sfActions
             sfConfig::set('sf_web_debug', false);
         }
 
+        // Pagination
+        $routing = $this->getContext()->getRouting();
+        $routeCurrent = $routing->getCurrentRouteName();
+        $pagination['urlNext'] = $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('start' => $request->getParameter('start') + 50)));
+        $pagination['urlPrevious'] = $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('start' => $request->getParameter('start') - 50)));
+        
         // Pass results to view
         $this->results = $results;
         $this->collection = $resource_collection;
         $this->segment = $resource_segment;
+        $this->pagination = $pagination;
 
         // Select template
         return ucfirst($format);

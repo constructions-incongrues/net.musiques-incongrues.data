@@ -29,7 +29,12 @@
     <p>Segments disponibles :</p>
     <ul>
     <?php foreach ($collection_data['segments'] as $segment_name => $segment_infos): ?>
-        <li><a href="<?php echo url_for(sprintf('@resources_collection?collection=%s#segments-%s', $collection_name, $segment_name)) ?>" title="Consulter la documentation du segment <?php echo $segment_name ?>"><?php echo $segment_name ?></a> : <strong><?php echo $segment_infos['count']?></strong> ressources</li>
+        <li>
+          <strong>
+            <?php echo $segment_name ?></strong> : <strong><?php echo $segment_infos['count']?></strong> ressources 
+            (<a title="Consulter les données de la collection" href="<?php echo url_for(sprintf('@resources_collection_segment_get?collection=%s&segment=%s', $collection_name, $segment_name), true) ?>" >explorer</a>
+            / <a href="<?php echo url_for(sprintf('@resources_collection?collection=%s#segments-%s', $collection_name, $segment_name)) ?>" title="Consulter la documentation du segment <?php echo $segment_name ?>">documentation</a>)
+            </li>
     <?php endforeach; ?>
     </ul>
   <?php endforeach; ?>
