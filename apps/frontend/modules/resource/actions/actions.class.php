@@ -93,6 +93,12 @@ class resourceActions extends sfActions
         }
         // TODO : lucene index must be configurable
         $resource_segment_instance = new $resource_segment_class($this->getContext()->getEventDispatcher(), sfLucene::getInstance('IndexA', 'fr'));
+        
+        // Default sort
+		if (!$request->hasParameter('sort_field')) {
+			$request->getParameterHolder()->add(array('sort_field' => 'contributed_at'));
+			$request->getParameterHolder()->add(array('sort_order' => 'desc'));
+		}
         $raw_results = $resource_segment_instance->search($request->getParameterHolder());
 
         // Format results
@@ -114,6 +120,8 @@ class resourceActions extends sfActions
 
         // Pass results to view
         $this->results = $results;
+        $this->collection = $resource_collection;
+        $this->segment = $resource_segment;
 
         // Select template
         return ucfirst($format);
