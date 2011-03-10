@@ -65,6 +65,7 @@ class CI_Search_Link_Segment
 
     // Define limit
     $limit = $parameters->get('limit', 50);
+    
     if ($limit == '-1')
     {
       $limit = '666666666';
@@ -96,6 +97,9 @@ class CI_Search_Link_Segment
     }
     $c->$sort_method($sort_field);
 
+    // Pagination
+    $c->setOffset($parameters->get('start', 0));
+    
     return $c;
   }
 
