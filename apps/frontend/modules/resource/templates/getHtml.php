@@ -25,12 +25,18 @@
 			<?php endif; ?>
 		<?php endforeach; ?>
 	</dl>
+	<dl>
+		<dt>Autres formats</dt>
+		<?php foreach ($urlsFormats as $format => $urlFormat): ?>
+		<dd><a href="<?php echo $urlFormat ?>" title="Obtenir les mêmes résultats au format <?php echo ucfirst($format) ?> format"><?php echo ucfirst($format) ?></a></dd>
+		<?php endforeach; ?>
+	</dl>
 	<hr />
 	<?php if (count($results) > 1): ?>
 		<?php foreach ($results as $resource): ?>
 			<?php if (is_array($resource)): ?>
 			  <dl>
-			  	<dt><a href="<?php echo $resource['url'] ?>" title="Accéder à l'URL" target="_blank"><?php echo $resource['url'] ?></a></dt>
+			  	<dt><a href="<?php echo $resource['url'] ?>" title="Accéder à la ressource" target="_blank"><?php echo $resource['url'] ?></a></dt>
 			  	<?php foreach ($resource as $propName => $propValue): ?>
 			  	<dd><strong><?php echo $propName ?> :</strong> <a href="<?php echo url_for(sprintf('@resources_collection_segment_get?collection=%s&segment=%s', $collection, $segment)) ?>?<?php echo urlencode($propName) ?>=<?php echo urlencode($propValue) ?>"><?php echo utf8_decode($propValue)?> </a></dd>
 			  	<?php endforeach; ?>
