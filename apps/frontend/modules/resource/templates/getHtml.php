@@ -6,16 +6,11 @@
 
 <div class="results html">
 	<p style="text-align: center;">Vous consultez les résultats <strong><?php echo $sf_request->getParameter('start', 0) ?></strong> à <strong><?php echo $sf_request->getParameter('start', 0) + 50 ?></strong> parmi les  <strong><?php echo $results['num_found']?></strong> trouvés</p>
-	<p style="text-align: center;">
-	  <?php if ($sf_request->getParameter('start', 0) > 0): ?>
-	    <a style="font-size: 2em;" href="<?php echo $pagination['urlPrevious']?>" title="Résultats précédents">&larr;</a>
-	  &nbsp;&nbsp;
-	  <?php endif; ?>
-	  <?php if ($sf_request->getParameter('start', 0) + 50 < $results['num_found'] ): ?>
-	  <a style="font-size: 2em;" href="<?php echo $pagination['urlNext'] ?>" title="Résultats suivants">&rarr;</a>
-	  <?php endif; ?>
-	</p>
+
+	<?php include_partial('pagination', array('pagination' => $pagination, 'results' => $results)) ?>
+
 	<hr />
+	
 	<dl>
 		<dt>Critères de recherche (<a href="<?php echo url_for(sprintf('@resources_collection?collection=%s#segments-%s', $sf_request->getParameter('collection'), $sf_request->getParameter('segment'))) ?>" title="Consulter la documentation du segment <?php echo $sf_request->getParameter('segment') ?>">?</a>)</dt>
 		<?php $parameters = $sf_request->getParameterHolder()->getAll() ?>
@@ -43,6 +38,11 @@
 			  </dl>
 			  <?php endif; ?>
 		<?php endforeach; ?>
+
+		<hr />
+
+		<?php include_partial('pagination', array('pagination' => $pagination, 'results' => $results)) ?>
+
 	<?php else: ?>
 		<p style="text-align: center;">No results. DARN !</p>
 	<?php endif; ?>
