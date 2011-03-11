@@ -5,6 +5,7 @@
 /config/databases.yml
 /web/uploads/*
 /web/index.php
+/data/solr_index
 
 # SCM files
 .arch-params
