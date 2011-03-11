@@ -38,7 +38,7 @@
 			  <dl>
 			  	<dt><a href="<?php echo $resource['url'] ?>" title="Accéder à la ressource" target="_blank"><?php echo $resource['url'] ?></a></dt>
 			  	<?php foreach ($resource as $propName => $propValue): ?>
-			  	<dd><strong><?php echo $propName ?> :</strong> <a href="<?php echo url_for(sprintf('@resources_collection_segment_get?collection=%s&segment=%s', $collection, $segment)) ?>?<?php echo urlencode($propName) ?>=<?php echo urlencode($propValue) ?>"><?php echo utf8_decode($propValue)?> </a></dd>
+			  	<dd><strong><?php echo $propName ?> :</strong> <a href="<?php echo url_for(sprintf('@resources_collection_segment_get?collection=%s&segment=%s', $collection, $segment)) ?>?<?php echo urlencode($propName) ?>=<?php echo urlencode(utf8_decode($propValue)) ?>"><?php echo utf8_decode($propValue)?> </a></dd>
 			  	<?php endforeach; ?>
 			  </dl>
 			  <?php endif; ?>
