@@ -97,9 +97,11 @@ class resourceActions extends sfActions
         // Default sort
 		if (!$request->hasParameter('sort_field')) {
 			$request->getParameterHolder()->add(array('sort_field' => 'contributed_at'));
-			$request->getParameterHolder()->add(array('sort_order' => 'desc'));
 		}
-        $raw_results = $resource_segment_instance->search($request->getParameterHolder());
+		if (!$request->hasParameter('sort_direction')) {
+			$request->getParameterHolder()->add(array('sort_direction' => 'desc'));
+		}
+		$raw_results = $resource_segment_instance->search($request->getParameterHolder());
 
         // Format results
         $formatter_class = sprintf('CI_Search_Formatter_%s', ucfirst($format));
@@ -123,12 +125,20 @@ class resourceActions extends sfActions
         $routeCurrent = $routing->getCurrentRouteName();
         $pagination['urlNext'] = $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('start' => $request->getParameter('start') + 50)));
         $pagination['urlPrevious'] = $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('start' => $request->getParameter('start') - 50)));
+
+        // Get other available formats
+		$urlsFormats = array(
+			'json' => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'json'))), 
+			'php'  => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'php'))),
+			'xspf'  => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'xspf'))),
+		);
         
         // Pass results to view
         $this->results = $results;
         $this->collection = $resource_collection;
         $this->segment = $resource_segment;
         $this->pagination = $pagination;
+        $this->urlsFormats = $urlsFormats;
 
         // Select template
         return ucfirst($format);
