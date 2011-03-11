@@ -20,7 +20,7 @@
 
     <hr />
 
-    <p><a href="https://launchpad.net/vanilla-miner/+milestone/0.6.0">Vanilla Miner 0.6.0</a> est développé par <a href="http://www.constructions-incongrues.net/">Constructions Incongrues</a> et est hébergé par <a href="http://www.pastis-hosting.net">Pastis Hosting</a>.</p>
+    <p><a href="https://github.com/contructions-incongrues/vanilla-miner/tree/<?php echo sfConfig::get('app_version') ?>">Vanilla Miner <?php echo sfConfig::get('app_version') ?></a> est développé par <a href="http://www.constructions-incongrues.net/">Constructions Incongrues</a> et est hébergé par <a href="http://www.pastis-hosting.net">Pastis Hosting</a>.</p>
     <p>Le code source du service est <a href="https://launchpad.net/vanilla-miner">distribué</a> sous licence <a href="http://www.gnu.org/licenses/agpl.html">GNU Affero GPLv3</a>.</p>
     <p>Ce service utilise (notamment) <a href="http://www.symfony-project.org">symfony</a>, <a href="http://www.doctrine-project.org">Doctrine</a> et <a href="http://lucene.apache.org/solr/">Solr</a>.</p>
     <p>Contact : contact @ musiques-incongrues . net</p>
