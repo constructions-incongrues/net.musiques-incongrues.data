@@ -26,9 +26,9 @@
 		<?php endforeach; ?>
 	</dl>
 	<dl>
-		<dt>Autres formats</dt>
+		<strong>Autres formats :</strong>
 		<?php foreach ($urlsFormats as $format => $urlFormat): ?>
-		<dd><a href="<?php echo $urlFormat ?>" title="Obtenir les mêmes résultats au format <?php echo ucfirst($format) ?> format"><?php echo ucfirst($format) ?></a></dd>
+		<a href="<?php echo $urlFormat ?>" title="Obtenir les mêmes résultats au format <?php echo ucfirst($format) ?> format"><?php echo ucfirst($format) ?></a>
 		<?php endforeach; ?>
 	</dl>
 	<hr />
