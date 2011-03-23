@@ -23,8 +23,15 @@ resources_collection:
 
 # Lists all available resources
 resources:
-  url:    /collections
+  url:   /collections
   param: { module: resource, action: collections }
+
+# Extraction endpoint
+extract:
+  url:   /extract
+  param: { module: resource, action: extract }
+  class: sfRequestRoute
+  requirements: {sf_method: POST}
 
 # Homepage
 homepage:

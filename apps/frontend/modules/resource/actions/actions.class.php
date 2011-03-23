@@ -143,4 +143,46 @@ class resourceActions extends sfActions
         // Select template
         return ucfirst($format);
     }
+    
+    public function executeExtract(sfWebRequest $request)
+    {
+//	    	// TODO : This should be done by Vanilla Miner. This function should only post raw data to Vanilla Miner instance via HTTP POST
+//		/*
+//		 * POST http://data.musiques-incongrues.net/extract
+//		 * Content-Type:text/json
+//		 * extraction_driver=LussumoVanilla1
+//		 * resource=
+//		 * 
+//		 */
+//		
+//		// Extract URLs from comment body
+//		$urls = extractUrls($discussionForm->Comment->Body);
+//	
+//		// If any URLs are found, save them to miner database, then post them to Vanilla Miner instance
+//		if (count($urls)) {
+//			// Include dependencies
+//			require(dirname(__FILE__).'/lib/vendor/SolrPhpClient/Apache/Solr/Document.php');
+//			require(dirname(__FILE__).'/lib/vendor/SolrPhpClient/Apache/Solr/Service.php');
+//			require(dirname(__FILE__).'/lib/vendor/SolrPhpClient/Apache/Solr/HttpTransport/Curl.php');
+//			
+//			$solrDocuments = array();
+//			foreach ($urls as $url) {
+//				// Build Solr document
+//				$solrDocument = new Apache_Solr_Document();
+//				$solrDocument->setField('url', $url);
+//				$solrDocument->setField('comment_id', $discussionForm->Comment->CommentID);
+//				$solrDocument->setField('contributed_at', strftime('%Y-%m-%dT%T.000Z', $discussionForm->Comment->DateCreated));
+//				$solrDocument->setField('contributor_id', $discussionForm->Comment->AuthUserID);
+//				$solrDocument->setField('contributor_name', $discussionForm->Comment->Name);
+//				$solrDocument->setField('discussion_id', $discussionForm->Discussion->DiscussionID);
+//				$solrDocument->setField('discussion_name', $discussionForm->Discussion->Name);
+//				$solrDocuments[] = $solrDocument;
+//			}
+//	
+//			// Post documents to Vanilla Miner instance
+//			$solrService = new Apache_Solr_Service('127.0.0.1', '8983', '/solr/IndexA_fr/', new Apache_Solr_HttpTransport_Curl());
+//			$solrResponse = $solrService->addDocuments($solrDocuments);
+//			$solrService->commit(true);
+//		}
+    }
 }
