@@ -167,15 +167,12 @@ class resourceActions extends sfActions
     	
     	// Check payload
     	$data = array();
-    	parse_str(urldecode(trim(file_get_contents('php://input'))), $data);
-    	if (!isset($data['resources'])) {
-    		throw new InvalidArgumentException('Missing query parameter "resources"', 400);
-    	}
+    	$data = urldecode(trim(file_get_contents('php://input')));
     	
     	// Decode JSON payload
-    	$resources = json_decode($data['resources'], true);
+    	$resources = json_decode($data, true);
     	if (!$resources) {
-    		throw new InvalidArgumentException('Malformed JSON string', 400);
+    		throw new InvalidArgumentException(sprintf('Malformed JSON string : "%s"', $data), 400);
     	}
     	
 		// Handle each posted resource
@@ -199,7 +196,7 @@ class resourceActions extends sfActions
 				$solrDocument = new Apache_Solr_Document();
 				$solrDocument->setField('url', $resource['url']);
 				$solrDocument->setField('comment_id', $resource['comment_id']);
-				$solrDocument->setField('contributed_at', $resource['contributed_at']);
+				$solrDocument->setField('contributed_at', strftime('%Y-%m-%dT%T.000Z', $resource['contributed_at']));
 				$solrDocument->setField('contributor_id', $resource['contributor_id']);
 				$solrDocument->setField('contributor_name', $resource['contributor_name']);
 				$solrDocument->setField('discussion_id', $resource['discussion_id']);
