@@ -8,4 +8,4 @@ all:
       links:
         model: Link
         segments: [all, mp3, images, youtube]
-  version: 0.6.6
+  version: 0.7.0
