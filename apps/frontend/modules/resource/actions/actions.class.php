@@ -187,7 +187,7 @@ class resourceActions extends sfActions
 			}
 
 			// Enhance data population
-			$resourceClean = self::autoPopulate($resourceClean);
+			$resourceClean = $this->autoPopulate($resourceClean);
 				
 			// Make sure url does not already exist in index
 			$solrService = new Apache_Solr_Service('127.0.0.1', '8983', '/solr/IndexA_fr/');
@@ -224,7 +224,7 @@ class resourceActions extends sfActions
 	 *
 	 * @throws InvalidArgumentException if link's "url" attribute is not set
 	 */
-	public static function autoPopulate(array $link, array $extensions_mimetype_map = array())
+	public function autoPopulate(array $link)
 	{
 		// Analyze URL
 		$url_components = parse_url($link['url']);
@@ -244,6 +244,9 @@ class resourceActions extends sfActions
 		// Try to guess document mimetype from extension
 		if (isset($url_components['path']))
 		{
+			// Provides extention <=> mimetype array maps
+		    require_once(sprintf('%s/vendor/php_arrays/extensions.php', sfConfig::get('sf_lib_dir')));
+        	$extensions_mimetype_map = $items;
 			$document_extension = pathinfo($url_components['path'], PATHINFO_EXTENSION);
 			if (isset($extensions_mimetype_map[$document_extension]))
 			{
