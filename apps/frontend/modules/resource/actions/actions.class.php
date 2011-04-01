@@ -147,43 +147,72 @@ class resourceActions extends sfActions
     
     public function executeExtract(sfWebRequest $request)
     {
-//	    	// TODO : This should be done by Vanilla Miner. This function should only post raw data to Vanilla Miner instance via HTTP POST
-//		/*
-//		 * POST http://data.musiques-incongrues.net/extract
-//		 * Content-Type:text/json
-//		 * extraction_driver=LussumoVanilla1
-//		 * resource=
-//		 * 
-//		 */
-//		
-//		// Extract URLs from comment body
-//		$urls = extractUrls($discussionForm->Comment->Body);
-//	
-//		// If any URLs are found, save them to miner database, then post them to Vanilla Miner instance
-//		if (count($urls)) {
-//			// Include dependencies
-//			require(dirname(__FILE__).'/lib/vendor/SolrPhpClient/Apache/Solr/Document.php');
-//			require(dirname(__FILE__).'/lib/vendor/SolrPhpClient/Apache/Solr/Service.php');
-//			require(dirname(__FILE__).'/lib/vendor/SolrPhpClient/Apache/Solr/HttpTransport/Curl.php');
-//			
-//			$solrDocuments = array();
-//			foreach ($urls as $url) {
-//				// Build Solr document
-//				$solrDocument = new Apache_Solr_Document();
-//				$solrDocument->setField('url', $url);
-//				$solrDocument->setField('comment_id', $discussionForm->Comment->CommentID);
-//				$solrDocument->setField('contributed_at', strftime('%Y-%m-%dT%T.000Z', $discussionForm->Comment->DateCreated));
-//				$solrDocument->setField('contributor_id', $discussionForm->Comment->AuthUserID);
-//				$solrDocument->setField('contributor_name', $discussionForm->Comment->Name);
-//				$solrDocument->setField('discussion_id', $discussionForm->Discussion->DiscussionID);
-//				$solrDocument->setField('discussion_name', $discussionForm->Discussion->Name);
-//				$solrDocuments[] = $solrDocument;
-//			}
-//	
-//			// Post documents to Vanilla Miner instance
-//			$solrService = new Apache_Solr_Service('127.0.0.1', '8983', '/solr/IndexA_fr/', new Apache_Solr_HttpTransport_Curl());
-//			$solrResponse = $solrService->addDocuments($solrDocuments);
-//			$solrService->commit(true);
-//		}
+		// Dependencies
+		require_once(sfConfig::get('sf_lib_dir').'/vendor/SolrPhpClient/Apache/Solr/Document.php');
+		require_once(sfConfig::get('sf_lib_dir').'/vendor/SolrPhpClient/Apache/Solr/Service.php');
+    	
+    	// This does not help here
+    	sfConfig::set('sf_web_debug', false);
+    	
+    	// Awaited data structure for each posted resource
+    	$resourceSpec = array(
+    		'url'                => FILTER_SANITIZE_URL, 
+    		'comment_id'         => FILTER_SANITIZE_NUMBER_INT, 
+    		'contributed_at'     => FILTER_SANITIZE_STRING,
+    		'contributor_id'     => FILTER_SANITIZE_NUMBER_INT,
+    		'contributor_name'   => FILTER_SANITIZE_STRING, 
+    		'discussion_id'      => FILTER_SANITIZE_NUMBER_INT, 
+    		'discussion_name'    => FILTER_SANITIZE_STRING
+    	);
+    	
+    	// Check payload
+    	$data = array();
+    	parse_str(urldecode(trim(file_get_contents('php://input'))), $data);
+    	if (!isset($data['resources'])) {
+    		throw new InvalidArgumentException('Missing query parameter "resources"', 400);
+    	}
+    	
+    	// Decode JSON payload
+    	$resources = json_decode($data['resources'], true);
+    	if (!$resources) {
+    		throw new InvalidArgumentException('Malformed JSON string', 400);
+    	}
+    	
+		// Handle each posted resource
+		$solrDocuments = array();
+		foreach ($resources as $resource) {
+			// Sanity checks
+			$resourceClean = array();
+			foreach ($resourceSpec as $key => $filter) {
+				if (!isset($resource[$key])) {
+					throw new InvalidArgumentException(sprintf('Missing resource property "%s"', $key), 400);
+				}
+				$resourceClean[$key] = filter_var($resource[$key], $filter);
+			}
+			
+			// Make sure url does not already exist in index
+			$solrService = new Apache_Solr_Service('127.0.0.1', '8983', '/solr/IndexA_fr/');
+			$results = $solrService->search(sprintf('url:"%s"', $resourceClean['url']));
+
+			if ($results->response->numFound === 0) {
+				// Build Solr document
+				$solrDocument = new Apache_Solr_Document();
+				$solrDocument->setField('url', $resource['url']);
+				$solrDocument->setField('comment_id', $resource['comment_id']);
+				$solrDocument->setField('contributed_at', $resource['contributed_at']);
+				$solrDocument->setField('contributor_id', $resource['contributor_id']);
+				$solrDocument->setField('contributor_name', $resource['contributor_name']);
+				$solrDocument->setField('discussion_id', $resource['discussion_id']);
+				$solrDocument->setField('discussion_name', $resource['discussion_name']);
+				$solrDocument->setField('sfl_guid', uniqid());
+				$solrDocuments[] = $solrDocument;
+			}
+		}
+
+		// Post documents to Vanilla Miner instance
+		$solrResponse = $solrService->addDocuments($solrDocuments);
+		$solrService->commit(true);
+		
+    	return sfView::NONE;
     }
 }
