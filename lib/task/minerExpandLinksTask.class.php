@@ -83,7 +83,7 @@ EOF;
             // TODO : move crawling code to dedicated class. and then create miner:crawl-url task
             require 'HTTP/Request2.php';
             $request = new HTTP_Request2(null, HTTP_Request2::METHOD_HEAD, array('follow_redirects' => true));
-            $request->setHeader('user-agent', 'vanilla-miner/1.1 (https://launchpad.net/vanilla-miner)');
+            $request->setHeader('user-agent', 'vanilla-miner/1.1 (https://github.com/contructions-incongrues/vanilla-miner)');
 
             foreach ($links as $link)
             {

@@ -244,6 +244,9 @@
   <field name="sfl_model"      type="string"   indexed="true"  stored="true"  multiValued="false" required="false"/>
   <field name="sfl_all"      type="text"   indexed="true"  stored="false"  multiValued="true" required="false"/>
   
+  <!-- Makes random sorting of results posible  -->
+  <dynamicField name="random_*" type="random" indexed="true" stored="true"/>
+  
   <!-- merged model information into one document -->
   %%MERGE_CONFIG%%
  </fields>

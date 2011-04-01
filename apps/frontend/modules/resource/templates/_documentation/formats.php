@@ -28,3 +28,9 @@
   <dd>Type MIME : <code>application/vnd.php.serialized</code></dd>
 </dl>
 
+<h4 id="formats-rss">rss</h4>
+<p>Les résultats sont renvoyés au format RSS.</p>
+<dl>
+  <dt>Caractéristiques</dt>
+  <dd>Type MIME : <code>application/rss+xml</code></dd>
+</dl>
