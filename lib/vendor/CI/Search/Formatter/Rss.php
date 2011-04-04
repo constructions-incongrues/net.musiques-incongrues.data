@@ -15,6 +15,9 @@ class CI_Search_Formatter_Rss
 		// Setup Zend
 		require_once(dirname(__FILE__).'/../../../ZendFramework-1.11.4-minimal/library/Zend/Loader/Autoloader.php');
 		Zend_Loader_Autoloader::getInstance();
+
+		// Non-writable /tmp workaround (see http://framework.zend.com/issues/browse/ZF-6668)
+		Zend_Locale::disableCache(true);
 		
 		// Create feed
 		$feed = new Zend_Feed_Writer_Feed();

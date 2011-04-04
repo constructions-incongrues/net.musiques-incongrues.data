@@ -33,6 +33,10 @@ class Link extends BaseLink
     {
       $this->domain_parent = sprintf('%s.%s', $domain_parts[1], $domain_parts[0]);
     }
+    else
+    {
+      $this->domain_parent = $this->domain_fqdn;
+    }
     
     // Try to guess document mimetype from extension
     if (isset($url_components['path']))
