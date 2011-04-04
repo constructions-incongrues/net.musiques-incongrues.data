@@ -1,6 +1,7 @@
 Link:
   actAs:
     Timestampable:
+    sfLuceneDoctrineTemplate:
   columns:
     id:
       type: integer

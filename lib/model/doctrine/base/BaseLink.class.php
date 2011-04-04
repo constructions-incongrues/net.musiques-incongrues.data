@@ -134,6 +134,8 @@ abstract class BaseLink extends sfDoctrineRecord
     {
         parent::setUp();
         $timestampable0 = new Doctrine_Template_Timestampable();
+        $sflucenedoctrinetemplate0 = new sfLuceneDoctrineTemplate();
         $this->actAs($timestampable0);
+        $this->actAs($sflucenedoctrinetemplate0);
     }
 }
