@@ -130,7 +130,7 @@ class resourceActions extends sfActions
 		$urlsFormats = array(
 			'json' => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'json'))), 
 			'php'  => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'php'))),
-			'xspf'  => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'xspf'))),
+			'xspf' => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'xspf'))),
 			'rss'  => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'rss'))),
 		);
 
