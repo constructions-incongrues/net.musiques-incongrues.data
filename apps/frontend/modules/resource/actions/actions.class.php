@@ -130,7 +130,7 @@ class resourceActions extends sfActions
 		$urlsFormats = array(
 			'json' => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'json'))), 
 			'php'  => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'php'))),
-			'xspf'  => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'xspf'))),
+			'xspf' => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'xspf'))),
 			'rss'  => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'rss'))),
 		);
 
@@ -147,14 +147,11 @@ class resourceActions extends sfActions
 
 	public function executeExtract(sfWebRequest $request)
 	{
-		// Dependencies
-		require_once(sfConfig::get('sf_lib_dir').'/vendor/SolrPhpClient/Apache/Solr/Document.php');
-		require_once(sfConfig::get('sf_lib_dir').'/vendor/SolrPhpClient/Apache/Solr/Service.php');
-		 
 		// This does not help here
 		sfConfig::set('sf_web_debug', false);
 		 
 		// Awaited data structure for each posted resource
+		// TODO : use doctrine model validation capabilities 
 		$resourceSpec = array(
     		'url'                => FILTER_SANITIZE_URL, 
     		'comment_id'         => FILTER_SANITIZE_NUMBER_INT, 
@@ -165,96 +162,53 @@ class resourceActions extends sfActions
     		'discussion_name'    => FILTER_SANITIZE_STRING
 		);
 		 
-		// Check payload
+		// Read payload
 		$data = urldecode(trim(file_get_contents('php://input')));
-		 
+
 		// Decode JSON payload
 		$resources = json_decode($data, true);
 		if (!$resources) {
 			throw new InvalidArgumentException(sprintf('Malformed JSON string : "%s"', $data), 400);
 		}
 		 
+		// Required for extension => mime type conversion
+		require_once(sprintf('%s/vendor/php_arrays/extensions.php', sfConfig::get('sf_lib_dir')));
+		
 		// Handle each posted resource
-		$solrDocuments = array();
 		foreach ($resources as $resource) {
+			// TODO : Move /extract to /collections/link/extract and abstract resource instanciation
+			$link = new Link();
+			
 			// Sanity checks
-			$resourceClean = array();
 			foreach ($resourceSpec as $key => $filter) {
 				if (!isset($resource[$key])) {
 					throw new InvalidArgumentException(sprintf('Missing resource property "%s"', $key), 400);
 				}
-				$resourceClean[$key] = filter_var($resource[$key], $filter);
+				$link->$key = filter_var($resource[$key], $filter);
 			}
 
-			// Enhance data population
-			$resourceClean = $this->autoPopulate($resourceClean);
+			// Enhance data
+			$link->autoPopulate($items);
+			
+			// Fix date strings for solr to understand them
+			$link->contributed_at = strftime('%Y-%m-%dT%T.000Z', $link->contributed_at);
+			
+			// Save link to database and solr
+			try {
+				$link->save();
 				
-			// Make sure url does not already exist in index
-			$solrService = new Apache_Solr_Service('127.0.0.1', '8983', '/solr/IndexA_fr/');
-			$results = $solrService->search(sprintf('url:"%s"', $resourceClean['url']));
-
-			if ($results->response->numFound === 0) {
-				// Build Solr document
-				$solrDocument = new Apache_Solr_Document();
-				$solrDocument->setField('url', $resourceClean['url']);
-				$solrDocument->setField('comment_id', $resourceClean['comment_id']);
-				$solrDocument->setField('contributed_at', strftime('%Y-%m-%dT%T.000Z', $resourceClean['contributed_at']));
-				$solrDocument->setField('contributor_id', $resourceClean['contributor_id']);
-				$solrDocument->setField('contributor_name', $resourceClean['contributor_name']);
-				$solrDocument->setField('discussion_id', $resourceClean['discussion_id']);
-				$solrDocument->setField('discussion_name', $resourceClean['discussion_name']);
-				$solrDocument->setField('domain_fqdn', $resourceClean['domain_fqdn']);
-				$solrDocument->setField('domain_parent', $resourceClean['domain_parent']);
-				$solrDocument->setField('mime_type', $resourceClean['mime_type']);
-				$solrDocument->setField('availability', 'unknown');
-				$solrDocument->setField('sfl_guid', uniqid());
-				$solrDocuments[] = $solrDocument;
+				// TODO : request link expansion
+				
+			} catch (Doctrine_Exception $e) {
+				// 23000 == Duplicate record
+				if ($e->getCode() === 23000) {
+					// TODO : handle multiple url occurences in index
+					$this->getLogger()->notice(sprintf('Link with URL "%s" already exist in database. Save cancelled.', $link->url));
+				}
 			}
 		}
 
-		// Post documents to Vanilla Miner instance
-		$solrResponse = $solrService->addDocuments($solrDocuments);
-		$solrService->commit(true);
-
+		// TODO : Appropriate HTTP response code
 		return sfView::NONE;
-	}
-
-	/**
-	 * Automatically populates link's attributes based on URL analysis.
-	 *
-	 * @throws InvalidArgumentException if link's "url" attribute is not set
-	 */
-	public function autoPopulate(array $link)
-	{
-		// Analyze URL
-		$url_components = parse_url($link['url']);
-		if (!$url_components)
-		{
-			throw new InvalidArgumentException(sprintf('"%s" is not a valid URL', $link['url']));
-		}
-
-		// Set domain information
-		$link['domain_fqdn'] = $url_components['host'];
-		$domain_parts = array_reverse(explode('.', $url_components['host']));
-		if (count($domain_parts) > 2)
-		{
-			$link['domain_parent'] = sprintf('%s.%s', $domain_parts[1], $domain_parts[0]);
-		}
-
-		// Try to guess document mimetype from extension
-		if (isset($url_components['path']))
-		{
-			// Provides extention <=> mimetype array maps
-		    require_once(sprintf('%s/vendor/php_arrays/extensions.php', sfConfig::get('sf_lib_dir')));
-        	$extensions_mimetype_map = $items;
-			$document_extension = pathinfo($url_components['path'], PATHINFO_EXTENSION);
-			if (isset($extensions_mimetype_map[$document_extension]))
-			{
-				$mimetype = $extensions_mimetype_map[$document_extension];
-				$link['mime_type'] = $mimetype;
-			}
-		}
-		
-		return $link;
 	}
 }
