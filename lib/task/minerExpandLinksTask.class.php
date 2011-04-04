@@ -170,8 +170,8 @@ EOF;
                     $link->availability = 'unavailable';
                 }
 
-                // Save link to database
-                $link->replace();
+            	// Save link to database and solr
+				$link->save();
 
                 // Update progress bar
                 if ($options['progress'])
