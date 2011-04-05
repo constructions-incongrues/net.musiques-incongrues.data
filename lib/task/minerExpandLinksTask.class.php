@@ -15,6 +15,7 @@ class minerExpandLinksTask extends sfBaseTask
         $this->addOptions(array(
         new sfCommandOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'dev'),
         new sfCommandOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'doctrine'),
+        new sfCommandOption('application', null, sfCommandOption::PARAMETER_REQUIRED, 'symfony application where Solr instance configuration is defined', 'frontend'),
         new sfCommandOption('progress', null, sfCommandOption::PARAMETER_NONE, 'Display a progress bar'),
         new sfCommandOption('verbose', null, sfCommandOption::PARAMETER_NONE, 'Display more informations about extraction process'),
         new sfCommandOption('all', null, sfCommandOption::PARAMETER_NONE, 'Expand all links in database. By default, only new links are expanded'),
