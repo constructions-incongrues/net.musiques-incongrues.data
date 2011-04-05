@@ -88,7 +88,12 @@ EOF;
 
             foreach ($links as $link)
             {
-                $link->expanded_at = time();
+                // Define link expansion time
+            	$link->expanded_at = time();
+                
+                // Update expanded links count
+				$links_expanded++;
+				
                 try
                 {
                     $request->setUrl($link->url);
@@ -101,7 +106,7 @@ EOF;
                         }
                         else
                         {
-                            $this->logSection('expand', sprintf('[%d] %s - Updating metadata, marking as available', $response->getStatus(), $link->url));
+                            $this->logSection('expand', sprintf('[%d] [%d/%d] %s - Updating metadata, marking as available', $response->getStatus(), $links_expanded, $links_count, $link->url));
                         }
 
                         // Update link data according to response
@@ -116,7 +121,7 @@ EOF;
                         }
                         else
                         {
-                            $this->logSection('expand', sprintf('[%d] %s - Received "Method Not Allowed" error code. Trying GET.', $response->getStatus(), $link->url));
+                            $this->logSection('expand', sprintf('[%d] [%d/%d] %s - Received "Method Not Allowed" error code. Trying GET.', $response->getStatus(), $links_expanded, $links_count, $link->url));
                         }
 
                         $request->setMethod(HTTP_Request2::METHOD_GET);
@@ -129,7 +134,7 @@ EOF;
                             }
                             else
                             {
-                                $this->logSection('expand', sprintf('[%d] %s - Updating metadata, marking as available', $response->getStatus(), $link->url));
+                                $this->logSection('expand', sprintf('[%d] [%d/%d] %s - Updating metadata, marking as available', $response->getStatus(), $links_expanded, $links_count, $link->url));
                             }
 
                             // Update link data according to response
@@ -145,8 +150,10 @@ EOF;
                         else
                         {
                             $this->logSection('expand', sprintf(
-                    			'[%d] %s (%d %s) - Marking as unavailable',
-                                $response->getStatus(),
+                    			'[%d] [%d/%d] %s (%d %s) - Marking as unavailable',
+                                $response->getStatus(), 
+                                $links_expanded, 
+                                $links_count,
                                 $link->url,
                                 $response->getStatus(),
                                 $response->getReasonPhrase()
@@ -166,7 +173,7 @@ EOF;
                     }
                     else
                     {
-                        $this->logSection('expand', sprintf('[ERR] Received exception with message "%s" for link "%s" - Marking as unavailable.', $e->getMessage(), $link->url), null, 'ERROR');
+                        $this->logSection('expand', sprintf('[ERR] [%d/%d] Received exception with message "%s" for link "%s" - Marking as unavailable.', $links_expanded, $links_count, $e->getMessage(), $link->url), null, 'ERROR');
                     }
                     $link->availability = 'unavailable';
                 }
@@ -177,7 +184,7 @@ EOF;
                 // Update progress bar
                 if ($options['progress'])
                 {
-                    $progress_bar->update(++$links_expanded);
+                    $progress_bar->update($links_expanded);
                 }
             }
         }
