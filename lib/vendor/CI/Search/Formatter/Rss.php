@@ -13,11 +13,13 @@ class CI_Search_Formatter_Rss
 	public function format(array $resources) {
 
 		// Setup Zend
+		// TODO : make sure embedded Zend Framework is used, not system wide
 		require_once(dirname(__FILE__).'/../../../ZendFramework-1.11.4-minimal/library/Zend/Loader/Autoloader.php');
 		Zend_Loader_Autoloader::getInstance();
 
-		// Non-writable /tmp workaround (see http://framework.zend.com/issues/browse/ZF-6668)
-		Zend_Locale::disableCache(true);
+		// Cache generation issue workaround (see http://framework.zend.com/issues/browse/ZF-6668)
+		// TODO : This should not be necessary
+		$_ENV['TMPDIR'] = dirname(__FILE__).'/../../../../../cache';
 		
 		// Create feed
 		$feed = new Zend_Feed_Writer_Feed();
