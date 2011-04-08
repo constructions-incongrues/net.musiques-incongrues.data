@@ -16,6 +16,7 @@ class CI_Search_Formatter_XmlFeed extends CI_Search_Formatter
 		
 		// Create feed
 		$feed = $this->getFeed();
+		$feed->setDateModified(new Zend_Date($resources[0]['contributed_at']));
 
 		// Create feed entries
 		foreach ($resources as $resource) {
