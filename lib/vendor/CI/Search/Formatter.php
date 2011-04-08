@@ -32,7 +32,6 @@ abstract class CI_Search_Formatter {
 	protected function getDefaultOptions() {
 		return array();
 	}
+	
 	abstract public function format(array $resources);
-	
-	
 }
