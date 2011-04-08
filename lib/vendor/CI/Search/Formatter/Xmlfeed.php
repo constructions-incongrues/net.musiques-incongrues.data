@@ -3,12 +3,8 @@ class CI_Search_Formatter_XmlFeed extends CI_Search_Formatter
 {
 	public $content_type = 'text/xml';
 	public $sf_has_layout = false;
-	protected $resources = array();
 
 	public function format(array $resources) {
-
-		$this->resources = $resources;
-		
 		// Setup Zend
 		// TODO : make sure embedded Zend Framework is used, not system wide
 		require_once(dirname(__FILE__).'/../../../ZendFramework-1.11.4-minimal/library/Zend/Loader/Autoloader.php');
