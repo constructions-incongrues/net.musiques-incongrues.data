@@ -70,6 +70,7 @@ class resourceActions extends sfActions
 		$resource_collection = $request->getParameter('collection', 'unknown');
 		$resource_segment = $request->getParameter('segment', 'all');
 		$format = $request->getParameter('format', 'html');
+		$formatterOptions = $request->getParameter('formatter_options', array());
 
 		// Get model corresponding to collection
 		$collections_infos = sfConfig::get('app_miner_collections');
@@ -83,7 +84,15 @@ class resourceActions extends sfActions
 		// TODO : autoload those classes
 		include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/%s/Segment.php', ucfirst($resource_model));
 		include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/%s/Segment/%s.php', ucfirst($resource_model), ucfirst($resource_segment));
-		include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/Formatter/%s.php', ucfirst($format));
+		
+		include sfConfig::get('sf_lib_dir').'/vendor/CI/Search/Formatter.php';
+		if (strstr($format, '_')) {
+			$partsFormat = explode('_', $format);
+			include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/Formatter/%s.php', ucfirst($partsFormat[0]));
+			include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/Formatter/%s/%s.php', ucfirst($partsFormat[0]), ucfirst($partsFormat[1]));
+		} else {
+			include sprintf(sfConfig::get('sf_lib_dir').'/vendor/CI/Search/Formatter/%s.php', ucfirst($format));
+		}
 
 		// Get results from selected resource segment
 		$resource_segment_class  = sprintf('CI_Search_%s_Segment_%s', ucfirst($resource_model), ucfirst($resource_segment));
@@ -104,12 +113,18 @@ class resourceActions extends sfActions
 		$raw_results = $resource_segment_instance->search($request->getParameterHolder());
 
 		// Format results
-		$formatter_class = sprintf('CI_Search_Formatter_%s', ucfirst($format));
+			if (strstr($format, '_')) {
+			$partsFormat = explode('_', $format);
+			$formatter_class = sprintf('CI_Search_Formatter_%s_%s', ucfirst($partsFormat[0]), ucfirst($partsFormat[1]));
+		} else {
+			$formatter_class = sprintf('CI_Search_Formatter_%s', ucfirst($format));
+		}
+		
 		if (!class_exists($formatter_class))
 		{
 			throw new InvalidArgumentException(sprintf('Formatter class "%s" does not exist for format "%s"', $formatter_class, $format));
 		}
-		$formatter = new $formatter_class($this->getContext()->getEventDispatcher());
+		$formatter = new $formatter_class($this->getContext()->getEventDispatcher(), $request, $formatterOptions);
 		$results = $formatter->format($raw_results);
 
 		// Tweak response depending on formatter
@@ -127,11 +142,12 @@ class resourceActions extends sfActions
 		$pagination['urlPrevious'] = $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('start' => $request->getParameter('start') - 50)));
 
 		// Get other available formats
+		// TODO : formats autodiscovery through introspection
 		$urlsFormats = array(
-			'json' => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'json'))), 
-			'php'  => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'php'))),
-			'xspf' => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'xspf'))),
-			'rss'  => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'rss'))),
+			'json'     => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'json'))), 
+			'php'      => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'php'))),
+			'xspf'     => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'xspf'))),
+			'podcast'  => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'xmlfeed_podcast'))),
 		);
 
 		// Pass results to view
@@ -140,6 +156,7 @@ class resourceActions extends sfActions
 		$this->segment = $resource_segment;
 		$this->pagination = $pagination;
 		$this->urlsFormats = $urlsFormats;
+		$this->formatterOptions = $formatter->getOptions();
 
 		// Select template
 		return ucfirst($format);
