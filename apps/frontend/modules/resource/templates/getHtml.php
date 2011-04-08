@@ -5,7 +5,7 @@
 <h2>Collection : <?php echo $sf_request->getParameter('collection') ?> / Segment : <?php echo $sf_request->getParameter('segment') ?></h2>
 
 <div class="results html">
-	<p style="text-align: center;">Vous consultez les résultats <strong><?php echo $sf_request->getParameter('start', 0) ?></strong> à <strong><?php echo $sf_request->getParameter('start', 0) + 50 ?></strong> parmi les  <strong><?php echo $results['num_found']?></strong> trouvés</p>
+	<p style="text-align: center;">Vous consultez les résultats <strong><?php echo $sf_request->getParameter('start', 0) + 1 ?></strong> à <strong><?php echo ($sf_request->getParameter('start', 0) + 50 > $results['num_found'] ? $results['num_found'] : $sf_request->getParameter('start', 0) + 50) ?></strong> parmi les  <strong><?php echo $results['num_found']?></strong> trouvés</p>
 
 	<?php include_partial('pagination', array('pagination' => $pagination, 'results' => $results)) ?>
 

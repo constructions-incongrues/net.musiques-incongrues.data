@@ -19,6 +19,7 @@ class minerExpandLinksTask extends sfBaseTask
         new sfCommandOption('progress', null, sfCommandOption::PARAMETER_NONE, 'Display a progress bar'),
         new sfCommandOption('verbose', null, sfCommandOption::PARAMETER_NONE, 'Display more informations about extraction process'),
         new sfCommandOption('all', null, sfCommandOption::PARAMETER_NONE, 'Expand all links in database. By default, only new links are expanded'),
+        new sfCommandOption('dql', null, sfCommandOption::PARAMETER_OPTIONAL, 'DQL for selecting links to be expanded'),
         new sfCommandOption('with-unavailable', null, sfCommandOption::PARAMETER_NONE, 'When expanding all links (--all), also include links previously marked as unavailable'),
         // TODO : add --older-than option
         ));
@@ -51,15 +52,18 @@ EOF;
         $q = Doctrine_Query::create()
             ->select('l.url')
             ->from('Link l');
-        if (!$options['all'])
-        {
-            $q->where('l.expanded_at is null');
+        if ($options['dql']) {
+        	$q = Doctrine_Query::create()->parseDqlQuery($options['dql']);
+        } else {
+	        if (!$options['all'])
+	        {
+	            $q->where('l.expanded_at is null');
+	        }
+	        if (!$options['with-unavailable'])
+	        {
+	            $q->andWhere('l.availability != "unavailable"');
+	        }
         }
-        if (!$options['with-unavailable'])
-        {
-            $q->andWhere('l.availability != "unavailable"');
-        }
-
         // Fetch links from database
         $links_count = $q->count();
         if ($links_count > 0)

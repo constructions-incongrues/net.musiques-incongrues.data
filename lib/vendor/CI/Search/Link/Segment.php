@@ -131,6 +131,6 @@ class CI_Search_Link_Segment
     $solr_config = sfLucene::getConfig();
     $schema_fields = $solr_config['IndexA']['models']['Link']['fields'];
 
-    return array_keys($schema_fields);
+    return array_merge(array('sfl_guid'), array_keys($schema_fields));
   }
 }
