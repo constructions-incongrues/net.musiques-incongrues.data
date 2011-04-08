@@ -1,0 +1,1 @@
+<?php echo $results->export($formatterOptions['type']) ?>
