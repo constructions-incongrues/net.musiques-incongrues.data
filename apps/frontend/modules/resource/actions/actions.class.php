@@ -113,7 +113,7 @@ class resourceActions extends sfActions
 		$raw_results = $resource_segment_instance->search($request->getParameterHolder());
 
 		// Format results
-			if (strstr($format, '_')) {
+		if (strstr($format, '_')) {
 			$partsFormat = explode('_', $format);
 			$formatter_class = sprintf('CI_Search_Formatter_%s_%s', ucfirst($partsFormat[0]), ucfirst($partsFormat[1]));
 		} else {

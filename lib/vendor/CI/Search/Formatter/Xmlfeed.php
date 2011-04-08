@@ -44,10 +44,10 @@ class CI_Search_Formatter_XmlFeed extends CI_Search_Formatter
 	 */
 	protected function getFeed() {
 		$feed = new Zend_Feed_Writer_Feed();
-		$feed->setTitle(sprintf('data.musiques-incongrues.net XML feed - collection : %s / segment : %s', $this->request->getParameter('collection'), $this->request->getParameter('segment')));
-		$feed->setLink(sprintf('http://data.musiques-incongrues.net/collections/%s/segments/%s/get?%s&format=%s', http_build_query($this->request->getParameterHolder()->getAll()), $this->request->getParameter('collection'), $this->request->getParameter('segment'), $this->options['type']));
+		$feed->setTitle(sprintf('data.musiques-incongrues.net XML feed - collection : %s / segment : %s / formatter : %s', $this->request->getParameter('collection'), $this->request->getParameter('segment'), __CLASS__));
+		$feed->setLink(sprintf('http://data.musiques-incongrues.net/collections/%s/segments/%s/get?%s&format=%s', $this->request->getParameter('collection'), $this->request->getParameter('segment'), http_build_query($this->request->getParameterHolder()->getAll()), $this->options['type']));
 		$feed->setFeedLink(sprintf('http://data.musiques-incongrues.net/collections/%s/segments/%s/get?%s&format=html', http_build_query($this->request->getParameterHolder()->getAll()), $this->request->getParameter('collection'), $this->request->getParameter('segment')), $this->options['type']);
-		$feed->setDescription(sprintf('Search criteria : %s', html_entity_decode(print_r($this->request->getParameterHolder()->getAll(), true))));
+		$feed->setDescription($this->getFeedDescription());
 		$feed->setDateModified(time());
 		
 		return $feed;
@@ -111,5 +111,20 @@ class CI_Search_Formatter_XmlFeed extends CI_Search_Formatter
 		}
 		$enclosure = array('uri' => $resource['url'], 'type' => $mimeType, 'length' => 666);
 		return $enclosure;
+	}
+	
+	protected function getDefaultOptions() {
+		return array('type' => 'atom');
+	}
+
+	protected function getFeedDescription() {
+		$exclude = array('module', 'action', 'format', 'sf_format', 'collection', 'segment');
+		$criterion = array();
+		foreach ($this->request->getParameterHolder()->getAll() as $parameterName => $parameterValue) {
+			if (!in_array($parameterName, $exclude)) {
+				$criterion[] = sprintf('%s : %s', $parameterName, $parameterValue);
+			}
+		}
+		return sprintf('Search criterion : %s', implode(' / ', $criterion));		
 	}
 }
