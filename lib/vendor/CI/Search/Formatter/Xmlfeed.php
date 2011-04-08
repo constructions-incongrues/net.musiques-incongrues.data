@@ -45,7 +45,6 @@ class CI_Search_Formatter_XmlFeed extends CI_Search_Formatter
 		$feed->setLink(sprintf('http://data.musiques-incongrues.net/collections/%s/segments/%s/get?%s&format=%s', $this->request->getParameter('collection'), $this->request->getParameter('segment'), http_build_query($this->request->getParameterHolder()->getAll()), $this->options['type']));
 		$feed->setFeedLink(sprintf('http://data.musiques-incongrues.net/collections/%s/segments/%s/get?%s&format=html', http_build_query($this->request->getParameterHolder()->getAll()), $this->request->getParameter('collection'), $this->request->getParameter('segment')), $this->options['type']);
 		$feed->setDescription($this->getFeedDescription());
-		$feed->setDateModified(time());
 		
 		return $feed;
 	}
