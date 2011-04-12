@@ -9,3 +9,5 @@ all:
         model: Link
         segments: [all, mp3, images, youtube]
   version: 0.9.1
+  pubsub:
+    hubs: ["http://pubsubhubbub.appspot.com/"]

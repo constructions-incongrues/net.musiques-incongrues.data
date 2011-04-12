@@ -210,12 +210,12 @@ class resourceActions extends sfActions
 			// Fix date strings for solr to understand them
 			$link->contributed_at = strftime('%Y-%m-%dT%T.000Z', $link->contributed_at);
 			
-			// Save link to database and solr
 			try {
+				// Save link to database and solr
 				$link->save();
 				
-				// TODO : request link expansion
-				
+				// Notify interested parties
+				$this->getContext()->getEventDispatcher()->notify(new sfEvent($this, 'ci.miner.resource.new', array('resource' => $link, 'request' => $request)));
 			} catch (Doctrine_Exception $e) {
 				// 23000 == Duplicate record
 				if ($e->getCode() === 23000) {
