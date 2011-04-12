@@ -15,4 +15,19 @@ class CI_Search_Formatter_Xmlfeed_Podcast extends CI_Search_Formatter_XmlFeed {
 		return sprintf('"%s" in discussion "%s"', $resource['title'], $resource['discussion_name']);
 	}
 	
+	protected function getEntryLink(array $resource) {
+		return sprintf(
+			'http://www.musiques-incongrues.net/forum/discussion/%d/%s', 
+			$resource['discussion_id'], 
+			$this->slugify($resource['discussion_name']));
+	}
+	
+	protected function getEntryEnclosure(array $resource) {
+		$mimeType = $resource['mime_type'];
+		if (!$mimeType) {
+			$mimeType = 'unknown';
+		}
+		$enclosure = array('uri' => $resource['url'], 'type' => $mimeType, 'length' => 666);
+		return $enclosure;
+	}
 }
