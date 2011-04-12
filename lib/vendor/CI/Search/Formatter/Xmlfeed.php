@@ -42,8 +42,25 @@ class CI_Search_Formatter_XmlFeed extends CI_Search_Formatter
 	protected function getFeed() {
 		$feed = new Zend_Feed_Writer_Feed();
 		$feed->setTitle(sprintf('data.musiques-incongrues.net XML feed - collection : %s / segment : %s / formatter : %s', $this->request->getParameter('collection'), $this->request->getParameter('segment'), __CLASS__));
-		$feed->setLink(sprintf('http://data.musiques-incongrues.net/collections/%s/segments/%s/get?%s&format=%s', $this->request->getParameter('collection'), $this->request->getParameter('segment'), http_build_query($this->request->getParameterHolder()->getAll()), $this->options['type']));
-		$feed->setFeedLink(sprintf('http://data.musiques-incongrues.net/collections/%s/segments/%s/get?%s&format=html', http_build_query($this->request->getParameterHolder()->getAll()), $this->request->getParameter('collection'), $this->request->getParameter('segment')), $this->options['type']);
+		$feed->setLink(sprintf(
+			'%s%s/collections/%s/segments/%s/get?%s&format=%s',
+			$this->request->getUriPrefix(),
+			$this->request->getRelativeUrlRoot(),
+			$this->request->getParameter('collection'), 
+			$this->request->getParameter('segment'),
+			// TODO : wrong html entities
+			http_build_query($this->request->getParameterHolder()->getAll()), 
+			$this->options['type']
+		));
+		$feed->setFeedLink(sprintf(
+			'%s%s/collections/%s/segments/%s/get?%s&format=html', 
+			$this->request->getUriPrefix(),
+			$this->request->getRelativeUrlRoot(),
+			$this->request->getParameter('collection'), 
+			$this->request->getParameter('segment'),
+			// TODO : wrong html entities
+			http_build_query($this->request->getParameterHolder()->getAll()) 
+		), $this->options['type']);
 		$feed->setDescription($this->getFeedDescription());
 		
 		return $feed;
@@ -76,20 +93,19 @@ class CI_Search_Formatter_XmlFeed extends CI_Search_Formatter
 		$entry->setDateCreated(new Zend_Date($resource['contributed_at']));
 		
 		// Entry enclosure
-		$entry->setEnclosure($this->getEntryEnclosure($resource));
+		if ($enclosure = $this->getEntryEnclosure($resource)) {
+			$entry->setEnclosure($enclosure);
+		}
 
 		return $entry;
 	}
 	
 	protected function getEntryTitle(array $resource) {
-		return $resource['discussion_name'];
+		return sprintf('"%s" in discussion "%s"', basename($resource['url']), $resource['discussion_name']);
 	}
 	
 	protected function getEntryLink(array $resource) {
-		return sprintf(
-			'http://www.musiques-incongrues.net/forum/discussion/%d/%s', 
-			$resource['discussion_id'], 
-			$this->slugify($resource['discussion_name']));
+		return $resource['url'];
 	}
 	
 	protected function getEntryAuthors(array $resource) {
@@ -101,14 +117,9 @@ class CI_Search_Formatter_XmlFeed extends CI_Search_Formatter
 	}
 	
 	protected function getEntryEnclosure(array $resource) {
-		$mimeType = $resource['mime_type'];
-		if (!$mimeType) {
-			$mimeType = 'unknown';
-		}
-		$enclosure = array('uri' => $resource['url'], 'type' => $mimeType, 'length' => 666);
-		return $enclosure;
+		return null;
 	}
-	
+		
 	protected function getDefaultOptions() {
 		return array('type' => 'atom');
 	}
