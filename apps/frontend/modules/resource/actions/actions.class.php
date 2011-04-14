@@ -210,12 +210,29 @@ class resourceActions extends sfActions
 			// Fix date strings for solr to understand them
 			$link->contributed_at = strftime('%Y-%m-%dT%T.000Z', $link->contributed_at);
 			
-			// Save link to database and solr
 			try {
+				// Save link to database and solr
 				$link->save();
 				
-				// TODO : request link expansion
+				// Clear related cache
+				// Setup Zend framework autoloading
+				set_include_path(sprintf('%s/vendor/ZendFramework-1.11.4-minimal/library/'.PATH_SEPARATOR.get_include_path(), sfConfig::get('sf_lib_dir')));
+				require_once(sprintf('%s/vendor/ZendFramework-1.11.4-minimal/library/Zend/Loader/Autoloader.php', sfConfig::get('sf_lib_dir')));
+				Zend_Loader_Autoloader::getInstance();
 				
+				// Setup cache manager
+				$cacheManager = new Zend_Cache_Manager();
+				
+				// Miner calls cache
+				$cacheManager->setCacheTemplate('functions', 
+					array(
+						'frontend' => array('name' => 'Function', 'options' => array('cache_id_prefix' => 'MiZendCache_Miner')), 
+						'backend'  => array('name' => 'File', 'options' => array('cache_dir' => '/tmp/', 'file_name_prefix' => 'mi_miner_cache'))
+					)
+				);
+
+				// Cleanup related cache
+				$cacheManager->getCache('functions')->clean(Zend_Cache::CLEANING_MODE_MATCHING_TAG, array(sprintf('discussion_%d', $link->discussion_id)));
 			} catch (Doctrine_Exception $e) {
 				// 23000 == Duplicate record
 				if ($e->getCode() === 23000) {
