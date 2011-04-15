@@ -185,6 +185,10 @@ EOF;
             	// Save link to database and solr
 				$link->save();
 
+				// Clear related cache
+				$cache = Zend_Cache::factory('Core', new Zend_Cache_Backend_File(array('cache_dir' => sfConfig::get('sf_cache_dir'), 'file_name_prefix' => 'mi_miner_cache')));
+				$cache->clean(Zend_Cache::CLEANING_MODE_MATCHING_ANY_TAG, array(sprintf('discussion_%d', $link->discussion_id)));
+				
                 // Update progress bar
                 if ($options['progress'])
                 {
