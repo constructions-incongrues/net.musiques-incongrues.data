@@ -9,6 +9,10 @@
     <?php include_javascripts() ?>
   </head>
   <body>
+  
+<?php if (function_exists('newrelic_get_browser_timing_header')): ?>
+	<?php echo newrelic_get_browser_timing_header(); ?>
+<?php endif; ?>
 
     <h1><?php echo link_to('data.musiques-incongrues.net', '@homepage', array('title' => "Retourner à la page d'accueil")) ?></h1>
 
@@ -38,6 +42,10 @@
       })();
 
     </script>
+
+<?php if (function_exists('newrelic_get_browser_timing_footer')): ?>
+	<?php echo newrelic_get_browser_timing_footer(); ?>
+<?php endif; ?>
 
   </body>
 </html>
