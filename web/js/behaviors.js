@@ -10,6 +10,11 @@ $(document)
             sh_highlightDocument();
           }
 
+          $('.help').click(function() {
+        	 $('#help').load($(this).attr('href') + ' ' + $(this).attr('x-fragment'));
+        	 return false;
+          });
+          
           $('#ananas')
               .click(
                   function() {

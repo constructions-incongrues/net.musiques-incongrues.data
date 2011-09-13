@@ -24,7 +24,9 @@
 		<strong>Autres formats :</strong>
 		<?php foreach ($urlsFormats as $format => $urlFormat): ?>
 		<a href="<?php echo $urlFormat ?>" title="Obtenir les mêmes résultats au format <?php echo ucfirst($format) ?> format"><?php echo ucfirst($format) ?></a>
+		(<a href="<?php echo $sf_request->getRelativeUrlRoot() ?>/collections/links#formats-<?php echo $format ?>" x-fragment="#formats-<?php echo $format ?>" title="Consulter la documentation du format" class="help">?</a>)
 		<?php endforeach; ?>
+		<p id="help"></p>
 	</dl>
 	<hr />
 	<?php if (count($results) > 1): ?>
