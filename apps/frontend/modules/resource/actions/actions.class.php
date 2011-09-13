@@ -145,7 +145,8 @@ class resourceActions extends sfActions
 		// TODO : formats autodiscovery through introspection
 		$urlsFormats = array(
 			'json'     => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'json'))),
-			'podcast'  => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'xmlfeed_podcast'))), 
+			'podcast'  => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'xmlfeed_podcast'))),
+			'plain'    => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'plain'))), 
 			'php'      => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'php'))),
 			'xspf'     => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'xspf')))
 		);
