@@ -2,7 +2,7 @@
 <?php use_javascript('jquery.oembed.js') ?>
 <?php use_javascript('jquery.masonry.js') ?>
 <?php use_javascript('gallery.behaviors.js') ?>
-<?php $hiddenParameters = array('action', 'sf_format', 'collection', 'segment', 'module') ?>
+<?php $hiddenParameters = array('action', 'sf_format', 'collection', 'segment', 'module', 'viewmode') ?>
 <?php $inSearch = array_keys($sf_request->getParameterHolder()->getAll()) ?>
 
 <style>
@@ -35,6 +35,14 @@
 		(<a href="<?php echo $sf_request->getRelativeUrlRoot() ?>/collections/links#formats-<?php echo $format ?>" x-fragment="#formats-<?php echo $format ?>" title="Consulter la documentation du format" class="help">?</a>)
 		<?php endforeach; ?>
 		<p id="help"></p>
+	</dl>
+	<dl>
+		<strong>Mode de visualisation :</strong>
+		<?php if ($sf_request->getParameter('viewmode', 'raw') == 'raw'): ?>
+			raw / <a href="<?php echo $viewModes['gallery'] ?>">gallery</a>
+		<?php elseif ($sf_request->getParameter('viewmode', 'raw') == 'gallery'): ?>
+			<a href="<?php echo $viewModes['raw'] ?>">raw</a> / gallery
+		<?php endif; ?>
 	</dl>
 	<hr />
 	

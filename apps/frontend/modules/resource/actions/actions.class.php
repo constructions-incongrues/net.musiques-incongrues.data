@@ -141,6 +141,12 @@ class resourceActions extends sfActions
 		$pagination['urlNext'] = $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('start' => $request->getParameter('start') + 50)));
 		$pagination['urlPrevious'] = $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('start' => $request->getParameter('start') - 50)));
 
+		// View modes
+		$viewModes = array(
+			'raw'     => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('viewmode' => 'raw'))),
+			'gallery' => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('viewmode' => 'gallery')))
+		);
+
 		// Get other available formats
 		// TODO : formats autodiscovery through introspection
 		$urlsFormats = array(
@@ -158,6 +164,7 @@ class resourceActions extends sfActions
 		$this->pagination = $pagination;
 		$this->urlsFormats = $urlsFormats;
 		$this->formatterOptions = $formatter->getOptions();
+		$this->viewModes = $viewModes;
 
 		// Select template
 		return ucfirst($format);
