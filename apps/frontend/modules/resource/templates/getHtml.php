@@ -1,8 +1,14 @@
 <?php use_helper('Text') ?>
 <?php use_javascript('jquery.oembed.js') ?>
+<?php use_javascript('jquery.masonry.js') ?>
 <?php use_javascript('gallery.behaviors.js') ?>
 <?php $hiddenParameters = array('action', 'sf_format', 'collection', 'segment', 'module') ?>
 <?php $inSearch = array_keys($sf_request->getParameterHolder()->getAll()) ?>
+
+<style>
+.item {width:430px;margin:10px;float:left;}
+#resources img {width:420px;}
+</style>
 
 <h2>Collection : <?php echo $sf_request->getParameter('collection') ?> / Segment : <?php echo $sf_request->getParameter('segment') ?></h2>
 
@@ -31,23 +37,28 @@
 		<p id="help"></p>
 	</dl>
 	<hr />
+	
 	<?php if (count($results) > 1): ?>
-		<?php foreach ($results as $resource): ?>
-			<?php if (is_array($resource)): ?>
-				<?php if ($sf_request->getParameter('viewmode', 'raw') == 'raw'): ?>
-				  <dl>
-				  	<dt><a href="<?php echo $resource['url'] ?>" title="Accéder à la ressource" target="_blank"><?php echo $resource['url'] ?></a></dt>
-				  	<?php foreach ($resource as $propName => $propValue): ?>
-				  	<dd><strong><?php echo $propName ?> :</strong> <a href="<?php echo url_for(sprintf('@resources_collection_segment_get?collection=%s&segment=%s', $collection, $segment)) ?>?<?php echo urlencode($propName) ?>=<?php echo urlencode(utf8_decode($propValue)) ?>"><?php echo utf8_decode($propValue)?> </a></dd>
-				  	<?php endforeach; ?>
-				  </dl>
-				<?php elseif ($sf_request->getParameter('viewmode', 'raw') == 'gallery'): ?>
-					<a class="oembed" href="<?php echo $resource['url'] ?>" title="Accéder à la ressource" target="_blank"><?php echo $resource['url'] ?></a>
+		<div id="resources">
+			<?php foreach ($results as $resource): ?>
+				<?php if (is_array($resource)): ?>
+					<?php if ($sf_request->getParameter('viewmode', 'raw') == 'raw'): ?>
+					  <dl>
+					  	<dt><a href="<?php echo $resource['url'] ?>" title="Accéder à la ressource" target="_blank"><?php echo $resource['url'] ?></a></dt>
+					  	<?php foreach ($resource as $propName => $propValue): ?>
+					  	<dd><strong><?php echo $propName ?> :</strong> <a href="<?php echo url_for(sprintf('@resources_collection_segment_get?collection=%s&segment=%s', $collection, $segment)) ?>?<?php echo urlencode($propName) ?>=<?php echo urlencode(utf8_decode($propValue)) ?>"><?php echo utf8_decode($propValue)?> </a></dd>
+					  	<?php endforeach; ?>
+					  </dl>
+					<?php elseif ($sf_request->getParameter('viewmode', 'raw') == 'gallery'): ?>
+						<div class="item">
+							<a class="oembed" href="<?php echo $resource['url'] ?>" title="Accéder à la ressource" target="_blank"><?php echo $resource['url'] ?></a>
+						</div>
+					<?php endif; ?>
 				<?php endif; ?>
-			<?php endif; ?>
-		<?php endforeach; ?>
+			<?php endforeach; ?>
+		</div>
 
-		<hr />
+		<hr style="clear:both;" />
 
 		<?php include_partial('pagination', array('pagination' => $pagination, 'results' => $results)) ?>
 
