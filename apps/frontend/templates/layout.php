@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" prefix="og: http://ogp.me/ns#">
   <head>
     <?php include_http_metas() ?>
     <?php include_metas() ?>
@@ -7,6 +7,8 @@
     <link rel="shortcut icon" type="image/png" href="<?php echo $sf_request->getRelativeUrlRoot() ?>/images/favicon.png" />
     <?php include_stylesheets() ?>
     <?php include_javascripts() ?>
+    <meta name="description" content="Ce site est dédié à l'exploration et à l'exploitation des ressources postées jour après jour par les contributeurs du forum des Musiques Incongrues." />
+    <meta property="og:image" content="http://www.musiques-incongrues.net/forum/extensions/Vanillacons/smilies/otro%20-%20fruits/pin01.gif" />
   </head>
   <body>
   

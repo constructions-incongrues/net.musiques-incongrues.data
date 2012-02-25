@@ -7,3 +7,7 @@ web/sf
 .settings/
 config/databases.yml
 data/sql/schema.sql
+
+# editors
+*.swp
+*~

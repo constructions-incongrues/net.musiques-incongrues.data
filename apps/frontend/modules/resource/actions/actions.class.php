@@ -157,6 +157,17 @@ class resourceActions extends sfActions
 			'xspf'     => $routing->generate($routeCurrent, array_merge($request->getParameterHolder()->getAll(), array('format' => 'xspf')))
 		);
 
+		// Generate page title (for html view)
+		$title = '';
+		$parameters = $request->getParameterHolder()->getAll();
+		$hiddenParameters = array('action', 'sf_format', 'viewmode', 'module', 'sort_field', 'sort_direction');
+		foreach ($parameters as $name => $value) {
+			if (!in_array($name, $hiddenParameters)) {
+				$title .= sprintf('%s : %s | ', $name, $value);
+			}
+		}
+		$this->getResponse()->setTitle(sprintf('%sdata.musiques-incongrues.net', $title));
+
 		// Pass results to view
 		$this->results = $results;
 		$this->collection = $resource_collection;
