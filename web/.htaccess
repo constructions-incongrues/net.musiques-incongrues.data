@@ -21,6 +21,10 @@ Options +FollowSymLinks +ExecCGI
   RewriteRule ^(.*)$ index.php [QSA,L]
 </IfModule>
 
+<IfModule mod_headers.c>
+  Header set Access-Control-Allow-Origin "*"
+</IfModule>
+
 # Newrelic configuration
 php_value newrelic.appname "data.musiques-incongrues.net"
 php_value newrelic.error_collector.record_database_errors 1
