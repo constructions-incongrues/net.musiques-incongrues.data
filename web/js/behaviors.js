@@ -1,10 +1,6 @@
 $(document)
     .ready(
         function() {
-          $('#toc').toc( {
-            context : '#documentation-container',
-            exclude : 'h1, h4, h5, h6'
-          });
 
           if (typeof sh_highlightDocument == 'function') {
             sh_highlightDocument();
