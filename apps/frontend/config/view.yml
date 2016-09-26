@@ -14,7 +14,7 @@ default:
 
   stylesheets:    ["http://fonts.googleapis.com/css?family=Crimson+Text", "http://fonts.googleapis.com/css?family=Lobster", "main.css?v=1"]
 
-  javascripts:    ["http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js", "http://samaxesjs.googlecode.com/files/jquery.toc-1.1.0.min.js", "jquery.slug.js", "behaviors.js?v=5"]
+  javascripts:    ["http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js", "jquery.slug.js", "behaviors.js?v=5"]
 
   has_layout:     true
   layout:         layout
