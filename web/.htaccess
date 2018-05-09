@@ -20,11 +20,3 @@ Options +FollowSymLinks +ExecCGI
   # no, so we redirect to our front web controller
   RewriteRule ^(.*)$ index.php [QSA,L]
 </IfModule>
-
-# Newrelic configuration
-php_value newrelic.appname "data.musiques-incongrues.net"
-php_value newrelic.error_collector.record_database_errors 1
-php_value newrelic.framework "symfony"
-
-# mod_pagespeed
-ModPagespeed off
